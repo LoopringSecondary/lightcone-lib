@@ -2,7 +2,7 @@
 
 ## TODO:
 
-- [x] migrate ethcube
-- [x] migrate ring deserilizer
-- [x] migrate ring generator
-- [x] migrate extractor
+- [] migrate ethcube
+- [] migrate ring deserilizer
+- [] migrate ring generator
+- [] migrate extractor
