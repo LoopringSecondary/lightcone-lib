@@ -18,26 +18,26 @@ package org.loopring.lightcone.lib
 
 import scala.collection.mutable.{ HashMap ⇒ HMap }
 
-trait RingGenerator {
+trait RingSerializer {
 
   // 根据环路信息组装合约data
-  def toSubmitableParam(ring: Ring): String
+  def serialize(ring: Ring): String
 
 }
 
-class RingGeneratorImpl(lrcAddress: String) extends RingGenerator {
+class RingSerializerImpl(lrcAddress: String) extends RingSerializer {
 
-  def toSubmitableParam(ring: Ring): String = {
+  def serialize(ring: Ring): String = {
     ring.orders.map(x ⇒ assert(x.hash.nonEmpty))
 
-    val helper = new GeneratorHelper(lrcAddress, ring)
+    val helper = new RingSerializerHelper(lrcAddress, ring)
     helper.assemble()
   }
 
 }
 
 // warning: 代码顺序不能调整！！！！！！
-private[lib] class GeneratorHelper(lrcAddress: String, ring: Ring) {
+private[lib] class RingSerializerHelper(lrcAddress: String, ring: Ring) {
   val ORDER_VERSION = 0
   val SERIALIZATION_VERSION = 0
 
