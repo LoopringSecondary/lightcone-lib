@@ -18,7 +18,7 @@ package org.loopring.lightcone.lib
 
 import org.web3j.utils.Numeric
 
-case class BitParser(x: String) {
+case class ByteParser(x: String) {
 
   val data = Numeric.cleanHexPrefix(x)
 

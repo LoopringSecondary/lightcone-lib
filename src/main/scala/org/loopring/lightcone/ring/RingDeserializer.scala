@@ -20,7 +20,7 @@ import org.web3j.utils.Numeric
 
 case class RingsDeserializer(lrcAddress: String, encoded: String) {
 
-  val dataparser: BitParser = BitParser(encoded)
+  val dataparser: ByteParser = ByteParser(encoded)
   var dataOffset: Int = 0
   var tableOffset: Int = 0
   var spendableList = Seq.empty[String]

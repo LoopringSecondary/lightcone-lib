@@ -18,7 +18,7 @@ package org.loopring.lightcone.lib
 
 import org.web3j.utils.Numeric
 
-case class BitStream() {
+case class ByteStream() {
 
   val addressLength = 20
 
