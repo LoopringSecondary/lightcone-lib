@@ -36,8 +36,4 @@ package object lib {
 
   }
 
-  implicit class RichAmount(src: Amount) {
-
-    def moreThanZero: Boolean = src.compare(BigInt(0)) > 0
-  }
 }

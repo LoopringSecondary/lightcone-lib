@@ -184,7 +184,7 @@ case class RingGenerator(
       insertDefault()
     }
 
-    if (order.feeAmount.moreThanZero) {
+    if (order.feeAmount.signum > 0) {
       insertOffset(datastream.addNumber(order.feeAmount, 32, false))
     } else {
       insertDefault()
