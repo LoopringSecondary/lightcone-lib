@@ -3,6 +3,6 @@
 ## TODO:
 
 - [ ] migrate ethcube
-- [ ] migrate ring deserilizer
-- [ ] migrate ring generator
+- [X] migrate ring deserilizer
+- [X] migrate ring generator
 - [ ] migrate extractor
