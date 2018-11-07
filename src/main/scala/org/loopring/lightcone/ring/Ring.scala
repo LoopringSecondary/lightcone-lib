@@ -16,12 +16,30 @@
 
 package org.loopring.lightcone.lib
 
+import org.web3j.utils.Numeric
+import org.web3j.crypto.{ Hash ⇒ web3Hash }
+
 case class Ring(
     feeReceipt: String,
     miner: String,
     sig: String,
     ringOrderIndex: Seq[Seq[Int]], // todo change to map
     orders: Seq[Order],
-    hash: String,
     transactionOrigin: String
-)
+) {
+
+  def hash = {
+    val data = orders.foldLeft(Array[Byte]()) {
+      (res, order) ⇒
+        res ++
+          Numeric.hexStringToByteArray(order.hash) ++
+          Numeric.toBytesPadded(BigInt(order.waiveFeePercentage).bigInteger, 2)
+    }
+    Numeric.toHexString(web3Hash.sha3(data))
+  }
+
+  def getInputData()(implicit serializer: RingSerializer) = {
+    serializer.serialize(this)
+  }
+
+}
