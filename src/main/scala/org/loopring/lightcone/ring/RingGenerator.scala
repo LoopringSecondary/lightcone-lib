@@ -49,24 +49,24 @@ private[lib] class GeneratorHelper(lrcAddress: String, ring: Ring) {
   def assemble() = {
     val numSpendables = setupSpendables
 
-    datastream.addNumber(0, 32)
+    datastream.addUint(0)
     createMiningTable()
     ring.orders.map(createOrderTable)
 
     val stream = ByteStream()
-    stream.addNumber(SERIALIZATION_VERSION, 2)
-    stream.addNumber(ring.orders.length, 2)
-    stream.addNumber(ring.ringOrderIndex.length, 2)
-    stream.addNumber(numSpendables, 2)
+    stream.addUint16(SERIALIZATION_VERSION)
+    stream.addUint16(ring.orders.length)
+    stream.addUint16(ring.ringOrderIndex.length)
+    stream.addUint16(numSpendables)
     stream.addHex(tablestream.getData)
 
     ring.ringOrderIndex.map(orderIdxs ⇒ {
-      stream.addNumber(orderIdxs.length, 1)
-      orderIdxs.map(o ⇒ stream.addNumber(o, 1))
-      stream.addNumber(0, 8 - orderIdxs.length)
+      stream.addUint8(orderIdxs.length)
+      orderIdxs.map(o ⇒ stream.addUint8(o))
+      stream.addX(0, 8 - orderIdxs.length)
     })
 
-    stream.addNumber(0, 32)
+    stream.addUint(0)
     stream.addHex(datastream.getData)
 
     stream.getData
@@ -139,16 +139,16 @@ private[lib] class GeneratorHelper(lrcAddress: String, ring: Ring) {
     insertOffset(datastream.addAddress(order.owner))
     insertOffset(datastream.addAddress(order.tokenS))
     insertOffset(datastream.addAddress(order.tokenB))
-    insertOffset(datastream.addNumber(order.amountS, 32, false))
-    insertOffset(datastream.addNumber(order.amountB, 32, false))
-    insertOffset(datastream.addNumber(order.validSince, 4, false))
+    insertOffset(datastream.addUint(order.amountS, false))
+    insertOffset(datastream.addUint(order.amountB, false))
+    insertOffset(datastream.addUint32(order.validSince, false))
 
     orderSpendableSMap.get(order.hash) match {
-      case Some(x: Int) ⇒ tablestream.addNumber(x.intValue(), 2)
+      case Some(x: Int) ⇒ tablestream.addUint16(x.intValue())
       case _            ⇒ throw new Exception("ringGenerator get " + order.hash + "orderSpendableS failed")
     }
     orderSpendableFeeMap.get(order.hash) match {
-      case Some(x: Int) ⇒ tablestream.addNumber(x.intValue(), 2)
+      case Some(x: Int) ⇒ tablestream.addUint16(x.intValue())
       case _            ⇒ throw new Exception("ringGenerator get " + order.hash + "orderSpendableFee failed")
     }
 
@@ -171,7 +171,7 @@ private[lib] class GeneratorHelper(lrcAddress: String, ring: Ring) {
     }
 
     if (order.validUntil > 0) {
-      insertOffset(datastream.addNumber(order.validUntil, 4, false))
+      insertOffset(datastream.addUint32(order.validUntil, false))
     } else {
       insertDefault()
     }
@@ -190,7 +190,7 @@ private[lib] class GeneratorHelper(lrcAddress: String, ring: Ring) {
       insertDefault()
     }
 
-    tablestream.addNumber(if (order.allOrNone) 1 else 0, 2)
+    tablestream.addUint16(if (order.allOrNone) 1 else 0)
 
     if (order.feeToken.nonEmpty && (order.feeToken safeneq lrcAddress)) {
       insertOffset(datastream.addAddress(order.feeToken))
@@ -199,15 +199,15 @@ private[lib] class GeneratorHelper(lrcAddress: String, ring: Ring) {
     }
 
     if (order.feeAmount.signum > 0) {
-      insertOffset(datastream.addNumber(order.feeAmount, 32, false))
+      insertOffset(datastream.addUint(order.feeAmount, false))
     } else {
       insertDefault()
     }
 
-    tablestream.addNumber(if (order.feePercentage > 0) order.feePercentage else 0, 2)
-    tablestream.addNumber(if (order.waiveFeePercentage > 0) order.waiveFeePercentage else 0, 2)
-    tablestream.addNumber(if (order.tokenSFeePercentage > 0) order.tokenSFeePercentage else 0, 2)
-    tablestream.addNumber(if (order.tokenBFeePercentage > 0) order.tokenBFeePercentage else 0, 2)
+    tablestream.addUint16(if (order.feePercentage > 0) order.feePercentage else 0)
+    tablestream.addUint16(if (order.waiveFeePercentage > 0) order.waiveFeePercentage else 0)
+    tablestream.addUint16(if (order.tokenSFeePercentage > 0) order.tokenSFeePercentage else 0)
+    tablestream.addUint16(if (order.tokenBFeePercentage > 0) order.tokenBFeePercentage else 0)
 
     if (order.tokenReceipt.nonEmpty && (order.tokenReceipt safeneq order.owner)) {
       insertOffset(datastream.addAddress(order.tokenReceipt))
@@ -215,28 +215,28 @@ private[lib] class GeneratorHelper(lrcAddress: String, ring: Ring) {
       insertDefault()
     }
 
-    tablestream.addNumber(if (order.walletSplitPercentage > 0) order.walletSplitPercentage else 0, 2)
+    tablestream.addUint16(if (order.walletSplitPercentage > 0) order.walletSplitPercentage else 0)
   }
 
   private def createBytes(data: String): String = {
     val bitstream = ByteStream()
-    bitstream.addNumber((data.length - 2) / 2, 32)
+    bitstream.addUint((data.length - 2) / 2)
     bitstream.addRawBytes(data)
     bitstream.getData
   }
 
   private def insertOffset(offset: Int): Unit = {
     assert(offset % 4 == 0)
-    tablestream.addNumber(offset / 4, 2)
+    tablestream.addUint16(offset / 4)
   }
 
   private def insertDefault(): Unit = {
-    tablestream.addNumber(0, 2)
+    tablestream.addUint16(0)
   }
 
   private def addPadding(): Unit = {
     if (datastream.length % 4 != 0) {
-      datastream.addNumber(0, 4 - (datastream.length % 4))
+      datastream.addX(0, 4 - (datastream.length % 4))
     }
   }
 }

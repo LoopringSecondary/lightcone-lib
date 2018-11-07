@@ -39,9 +39,15 @@ case class ByteStream() {
   def addAddress(x: String): Int =
     insert(Numeric.toHexStringNoPrefixZeroPadded(Numeric.toBigInt(x), addressLength * 2), false)
 
-  // todo: fuk 负数问题
-  def addNumber(num: BigInt, numBytes: Int = 4, forceAppend: Boolean = true): Int =
-    insert(Numeric.toHexStringNoPrefixZeroPadded(num.bigInteger, numBytes * 2), forceAppend)
+  def addUint8(num: BigInt): Int = addBigInt(num, 1, true)
+
+  def addUint16(num: BigInt): Int = addBigInt(num, 2, true)
+
+  def addUint32(num: BigInt, forceAppend: Boolean = true): Int = addBigInt(num, 4, forceAppend)
+
+  def addUint(num: BigInt, forceAppend: Boolean = true): Int = addBigInt(num, 32, forceAppend)
+
+  def addX(num: BigInt, numBytes: Int, forceAppend: Boolean = true): Int = addBigInt(num, numBytes, forceAppend)
 
   def addBoolean(b: Boolean, forceAppend: Boolean = true): Int =
     insert(Numeric.toHexStringNoPrefix((if (b) BigInt(1) else BigInt(0)).bigInteger), forceAppend)
@@ -51,6 +57,10 @@ case class ByteStream() {
 
   def addRawBytes(str: String): Int =
     insert(Numeric.cleanHexPrefix(str), true)
+
+  // todo: fuk 负数问题
+  private def addBigInt(num: BigInt, numBytes: Int, forceAppend: Boolean = true): Int =
+    insert(Numeric.toHexStringNoPrefixZeroPadded(num.bigInteger, numBytes * 2), forceAppend)
 
   private def insert(x: String, forceAppend: Boolean): Int = {
     var offset = length()
