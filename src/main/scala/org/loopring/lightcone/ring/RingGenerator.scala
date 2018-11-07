@@ -18,37 +18,49 @@ package org.loopring.lightcone.lib
 
 import scala.collection.mutable.{ HashMap ⇒ HMap }
 
-// warning: 代码顺序不能调整！！！！！！
-case class RingGenerator(
-    lrcAddress: String,
-    ringsInfo: Ring
-) {
+trait RingGenerator {
 
+  // 根据环路信息组装合约data
+  def toSubmitableParam(ring: Ring): String
+
+}
+
+class RingGeneratorImpl(lrcAddress: String) extends RingGenerator {
+
+  def toSubmitableParam(ring: Ring): String = {
+    ring.orders.map(x ⇒ assert(x.hash.nonEmpty))
+
+    val helper = new GeneratorHelper(lrcAddress, ring)
+    helper.assemble()
+  }
+
+}
+
+// warning: 代码顺序不能调整！！！！！！
+private[lib] class GeneratorHelper(lrcAddress: String, ring: Ring) {
   val ORDER_VERSION = 0
   val SERIALIZATION_VERSION = 0
 
-  ringsInfo.orders.map(x ⇒ assert(x.hash.nonEmpty))
+  val datastream = ByteStream()
+  val tablestream = ByteStream()
+  val orderSpendableSMap = HMap.empty[String, Int]
+  val orderSpendableFeeMap = HMap.empty[String, Int]
 
-  var datastream = ByteStream()
-  var tablestream = ByteStream()
-  var orderSpendableSMap = HMap.empty[String, Int]
-  var orderSpendableFeeMap = HMap.empty[String, Int]
-
-  def toSubmitableParam(): String = {
-    val numSpendables = setupSpendables()
+  def assemble() = {
+    val numSpendables = setupSpendables
 
     datastream.addNumber(0, 32)
     createMiningTable()
-    ringsInfo.orders.map(createOrderTable)
+    ring.orders.map(createOrderTable)
 
     val stream = ByteStream()
     stream.addNumber(SERIALIZATION_VERSION, 2)
-    stream.addNumber(ringsInfo.orders.length, 2)
-    stream.addNumber(ringsInfo.ringOrderIndex.length, 2)
+    stream.addNumber(ring.orders.length, 2)
+    stream.addNumber(ring.ringOrderIndex.length, 2)
     stream.addNumber(numSpendables, 2)
     stream.addHex(tablestream.getData)
 
-    ringsInfo.ringOrderIndex.map(orderIdxs ⇒ {
+    ring.ringOrderIndex.map(orderIdxs ⇒ {
       stream.addNumber(orderIdxs.length, 1)
       orderIdxs.map(o ⇒ stream.addNumber(o, 1))
       stream.addNumber(0, 8 - orderIdxs.length)
@@ -60,11 +72,11 @@ case class RingGenerator(
     stream.getData
   }
 
-  private def setupSpendables(): Int = {
+  def setupSpendables: Int = {
     var numSpendables = 0
     var ownerTokens = HMap.empty[String, Int]
 
-    ringsInfo.orders.map(order ⇒ {
+    ring.orders.map(order ⇒ {
       assert(order.hash.nonEmpty)
 
       val tokenFee = if (order.feeToken.nonEmpty) order.feeToken else lrcAddress
@@ -94,33 +106,33 @@ case class RingGenerator(
 
   // 注意:
   // 1. 对于relay来说miner就是transactionOrigin
-  private def createMiningTable(): Unit = {
-    require(ringsInfo.miner.nonEmpty)
+  def createMiningTable(): Unit = {
+    require(ring.miner.nonEmpty)
 
-    val transactionOrigin = if (ringsInfo.transactionOrigin.nonEmpty) ringsInfo.transactionOrigin else ringsInfo.miner
-    val feeRecipient = if (ringsInfo.feeReceipt.nonEmpty) ringsInfo.feeReceipt else transactionOrigin
+    val transactionOrigin = if (ring.transactionOrigin.nonEmpty) ring.transactionOrigin else ring.miner
+    val feeRecipient = if (ring.feeReceipt.nonEmpty) ring.feeReceipt else transactionOrigin
 
     if (feeRecipient safeneq transactionOrigin) {
-      insertOffset(datastream.addAddress(ringsInfo.feeReceipt))
+      insertOffset(datastream.addAddress(ring.feeReceipt))
     } else {
       insertDefault()
     }
 
-    if (ringsInfo.miner safeneq feeRecipient) {
-      insertOffset(datastream.addAddress(ringsInfo.miner))
+    if (ring.miner safeneq feeRecipient) {
+      insertOffset(datastream.addAddress(ring.miner))
     } else {
       insertDefault()
     }
 
-    if (ringsInfo.sig.nonEmpty && (ringsInfo.miner safeneq transactionOrigin)) {
-      insertOffset(datastream.addHex(createBytes(ringsInfo.sig)))
+    if (ring.sig.nonEmpty && (ring.miner safeneq transactionOrigin)) {
+      insertOffset(datastream.addHex(createBytes(ring.sig)))
       addPadding()
     } else {
       insertDefault()
     }
   }
 
-  private def createOrderTable(order: Order): Unit = {
+  def createOrderTable(order: Order): Unit = {
     addPadding()
 
     insertOffset(ORDER_VERSION)
@@ -227,5 +239,4 @@ case class RingGenerator(
       datastream.addNumber(0, 4 - (datastream.length % 4))
     }
   }
-
 }

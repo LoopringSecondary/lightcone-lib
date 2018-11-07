@@ -18,7 +18,23 @@ package org.loopring.lightcone.lib
 
 import org.web3j.utils.Numeric
 
-case class RingsDeserializer(lrcAddress: String, encoded: String) {
+trait RingDeserializer {
+
+  // 将合约环路data解析为ring
+  def deserialize(encoded: String): Ring
+
+}
+
+class RingDeserializerImpl(lrcAddress: String) extends RingDeserializer {
+
+  def deserialize(encoded: String): Ring = {
+    val helper = new RingDeserializerHelper(lrcAddress, encoded)
+    helper.dissemble()
+  }
+
+}
+
+private[lib] class RingDeserializerHelper(lrcAddress: String, encoded: String) {
 
   val dataparser: ByteParser = ByteParser(encoded)
   var dataOffset: Int = 0
@@ -27,7 +43,7 @@ case class RingsDeserializer(lrcAddress: String, encoded: String) {
 
   val undefined = "0x0"
 
-  def deserialize(): Ring = {
+  def dissemble(): Ring = {
     val version = dataparser.extractUint16(0)
     val numOrders = dataparser.extractUint16(2)
     val numRings = dataparser.extractUint16(4)
