@@ -99,19 +99,19 @@ case class RingGenerator(
     val feeRecipient = if (ringsInfo.feeReceipt.nonEmpty) ringsInfo.feeReceipt else transactionOrigin
 
     if (feeRecipient safeneq transactionOrigin) {
-      insertOffset(datastream.addAddress(ringsInfo.feeReceipt, 20, false))
+      insertOffset(datastream.addAddress(ringsInfo.feeReceipt))
     } else {
       insertDefault()
     }
 
     if (ringsInfo.miner safeneq feeRecipient) {
-      insertOffset(datastream.addAddress(ringsInfo.miner, 20, false))
+      insertOffset(datastream.addAddress(ringsInfo.miner))
     } else {
       insertDefault()
     }
 
     if (ringsInfo.sig.nonEmpty && (ringsInfo.miner safeneq transactionOrigin)) {
-      insertOffset(datastream.addHex(createBytes(ringsInfo.sig), false))
+      insertOffset(datastream.addHex(createBytes(ringsInfo.sig)))
       addPadding()
     } else {
       insertDefault()
@@ -122,9 +122,9 @@ case class RingGenerator(
     addPadding()
 
     insertOffset(ORDER_VERSION)
-    insertOffset(datastream.addAddress(order.owner, 20, false))
-    insertOffset(datastream.addAddress(order.tokenS, 20, false))
-    insertOffset(datastream.addAddress(order.tokenB, 20, false))
+    insertOffset(datastream.addAddress(order.owner))
+    insertOffset(datastream.addAddress(order.tokenS))
+    insertOffset(datastream.addAddress(order.tokenB))
     insertOffset(datastream.addNumber(order.amountS, 32, false))
     insertOffset(datastream.addNumber(order.amountB, 32, false))
     insertOffset(datastream.addNumber(order.validSince, 4, false))
@@ -139,7 +139,7 @@ case class RingGenerator(
     }
 
     if (order.dualAuthAddress.nonEmpty) {
-      insertOffset(datastream.addAddress(order.dualAuthAddress, 20, false))
+      insertOffset(datastream.addAddress(order.dualAuthAddress))
     } else {
       insertDefault()
     }
@@ -151,7 +151,7 @@ case class RingGenerator(
     insertDefault()
 
     if (order.wallet.nonEmpty) {
-      insertOffset(datastream.addAddress(order.wallet, 20, false))
+      insertOffset(datastream.addAddress(order.wallet))
     } else {
       insertDefault()
     }
@@ -179,7 +179,7 @@ case class RingGenerator(
     tablestream.addNumber(if (order.allOrNone) 1 else 0, 2)
 
     if (order.feeToken.nonEmpty && (order.feeToken safeneq lrcAddress)) {
-      insertOffset(datastream.addAddress(order.feeToken, 20, false))
+      insertOffset(datastream.addAddress(order.feeToken))
     } else {
       insertDefault()
     }
@@ -196,7 +196,7 @@ case class RingGenerator(
     tablestream.addNumber(if (order.tokenBFeePercentage > 0) order.tokenBFeePercentage else 0, 2)
 
     if (order.tokenReceipt.nonEmpty && (order.tokenReceipt safeneq order.owner)) {
-      insertOffset(datastream.addAddress(order.tokenReceipt, 20, false))
+      insertOffset(datastream.addAddress(order.tokenReceipt))
     } else {
       insertDefault()
     }

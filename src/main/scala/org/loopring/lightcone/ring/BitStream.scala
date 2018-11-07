@@ -20,6 +20,8 @@ import org.web3j.utils.Numeric
 
 case class BitStream() {
 
+  val addressLength = 20
+
   var data: String = ""
 
   def getData: String = {
@@ -34,8 +36,8 @@ case class BitStream() {
   // functions for pack
   //
   /////////////////////////
-  def addAddress(address: String, numBytes: Int = 20, forceAppend: Boolean = true): Int =
-    insert(Numeric.toHexStringNoPrefixZeroPadded(Numeric.toBigInt(address), numBytes * 2), forceAppend)
+  def addAddress(x: String): Int =
+    insert(Numeric.toHexStringNoPrefixZeroPadded(Numeric.toBigInt(x), addressLength * 2), false)
 
   // todo: fuk 负数问题
   def addNumber(num: BigInt, numBytes: Int = 4, forceAppend: Boolean = true): Int =
@@ -78,16 +80,5 @@ case class BitStream() {
   }
 
   def length(): Int = data.length / 2
-
-  private def padString(src: String, targetLength: Int): String = {
-    var x = src
-    if (x.length > targetLength) {
-      throw new Error("0x" + x + " is too big to fit in the requested length (" + targetLength + ")")
-    }
-    while (x.length < targetLength) {
-      x = "0" + x
-    }
-    x
-  }
 
 }
