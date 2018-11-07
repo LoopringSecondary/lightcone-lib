@@ -28,10 +28,10 @@ case class RingsDeserializer(lrcAddress: String, encoded: String) {
   val undefined = "0x0"
 
   def deserialize(): Ring = {
-    val version = this.dataparser.extractUint16(0)
-    val numOrders = this.dataparser.extractUint16(2)
-    val numRings = this.dataparser.extractUint16(4)
-    val numSpendables = this.dataparser.extractUint16(6)
+    val version = dataparser.extractUint16(0)
+    val numOrders = dataparser.extractUint16(2)
+    val numRings = dataparser.extractUint16(4)
+    val numSpendables = dataparser.extractUint16(6)
 
     assert(version.equals(0), "Unsupported serialization format")
     assert(numSpendables > 0, "Invalid number of spendables")

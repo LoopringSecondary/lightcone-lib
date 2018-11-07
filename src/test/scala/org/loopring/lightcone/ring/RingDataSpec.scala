@@ -85,18 +85,13 @@ class RingDataSpec extends FlatSpec with Matchers {
   }
 
   "deserialize" should "parse ring to orders" in {
-    val hashseq = Seq(order1.hash, order2.hash)
-    val ringhash = "0x6cacf9c57af230d0d1d75364196dc144f049b23138200586a7e8d7e467e9355c"
+    // val ringhash = "0x6cacf9c57af230d0d1d75364196dc144f049b23138200586a7e8d7e467e9355c"
     val result = RingsDeserializer(lrcAddress, originInput).deserialize()
 
-    val orders = result.orders
-    //    info(orders.head.toString)
-    //    info(order1.toString)
-    //    info(orders.last.toString)
-    //    info(order2.toString)
+    result.orders.size should be(2)
 
-    compare(orders.head, order1) should be(true)
-    compare(orders.last, order2) should be(true)
+    compare(result.orders.head, order1) should be(true)
+    compare(result.orders.last, order2) should be(true)
   }
 
   private def compare(src: Order, dst: Order): Boolean = {

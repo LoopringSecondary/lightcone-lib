@@ -23,10 +23,10 @@ case class BitStream() {
   var data: String = ""
 
   def getData: String = {
-    if (this.data.length.equals(0)) {
+    if (data.length.equals(0)) {
       "0x0"
     } else {
-      "0x" + this.data
+      "0x" + data
     }
   }
 
@@ -54,21 +54,18 @@ case class BitStream() {
     insert(Numeric.cleanHexPrefix(str), forceAppend)
 
   private def insert(x: String, forceAppend: Boolean): Int = {
-    var offset = this.length()
-
-    val sub = x.toString
-    var exist = false
+    var offset = length()
 
     if (!forceAppend) {
       // Check if the data we're inserting is already available in the bitstream.
       // If so, return the offset to the location.
       var start = 0
-      while ((start != -1) && !exist) {
-        start = this.data.indexOf(sub, start)
+      while (start != -1) {
+        start = data.indexOf(x, start)
         if (start != -1) {
           if ((start % 2) == 0) {
             offset = start / 2
-            exist = true // return
+            return offset
           } else {
             start += 1
           }
@@ -76,14 +73,11 @@ case class BitStream() {
       }
     }
 
-    if (!exist) {
-      this.data ++= x
-    }
-
+    data ++= x
     offset
   }
 
-  def length(): Int = this.data.length / 2
+  def length(): Int = data.length / 2
 
   private def padString(src: String, targetLength: Int): String = {
     var x = src
