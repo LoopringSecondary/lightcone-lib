@@ -41,9 +41,6 @@ case class BitStream() {
 
   // todo: fuk 负数问题
   def addNumber(num: BigInt, numBytes: Int = 4, forceAppend: Boolean = true): Int =
-    addBigNumber(num, numBytes, forceAppend)
-
-  def addBigNumber(num: BigInt, numBytes: Int = 32, forceAppend: Boolean = true): Int =
     insert(Numeric.toHexStringNoPrefixZeroPadded(num.bigInteger, numBytes * 2), forceAppend)
 
   def addBoolean(b: Boolean, forceAppend: Boolean = true): Int =
@@ -52,8 +49,8 @@ case class BitStream() {
   def addHex(str: String, forceAppend: Boolean = true): Int =
     insert(Numeric.cleanHexPrefix(str), forceAppend)
 
-  def addRawBytes(str: String, forceAppend: Boolean = true): Int =
-    insert(Numeric.cleanHexPrefix(str), forceAppend)
+  def addRawBytes(str: String): Int =
+    insert(Numeric.cleanHexPrefix(str), true)
 
   private def insert(x: String, forceAppend: Boolean): Int = {
     var offset = length()
