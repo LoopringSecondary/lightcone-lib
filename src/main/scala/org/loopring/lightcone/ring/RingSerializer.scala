@@ -16,7 +16,7 @@
 
 package org.loopring.lightcone.lib
 
-import scala.collection.mutable.{ HashMap ⇒ HMap }
+import scala.collection.mutable.{ HashMap ⇒ MMap }
 
 trait RingSerializer {
 
@@ -28,7 +28,7 @@ trait RingSerializer {
 class RingSerializerImpl(lrcAddress: String) extends RingSerializer {
 
   def serialize(ring: Ring): String = {
-    ring.orders.map(x ⇒ assert(x.hash.nonEmpty))
+    ring.orders.foreach(o ⇒ assert(o.hash.nonEmpty))
 
     val helper = new RingSerializerHelper(lrcAddress, ring)
     helper.assemble()
@@ -43,15 +43,15 @@ private[lib] class RingSerializerHelper(lrcAddress: String, ring: Ring) {
 
   val datastream = ByteStream()
   val tablestream = ByteStream()
-  val orderSpendableSMap = HMap.empty[String, Int]
-  val orderSpendableFeeMap = HMap.empty[String, Int]
+  val orderSpendableSMap = MMap.empty[String, Int]
+  val orderSpendableFeeMap = MMap.empty[String, Int]
 
-  def assemble() = {
+  def assemble(): String = {
     val numSpendables = setupSpendables
 
     datastream.addUint(0)
     createMiningTable()
-    ring.orders.map(createOrderTable)
+    ring.orders.foreach(createOrderTable)
 
     val stream = ByteStream()
     stream.addUint16(SERIALIZATION_VERSION)
@@ -74,9 +74,9 @@ private[lib] class RingSerializerHelper(lrcAddress: String, ring: Ring) {
 
   def setupSpendables: Int = {
     var numSpendables = 0
-    var ownerTokens = HMap.empty[String, Int]
+    var ownerTokens = MMap.empty[String, Int]
 
-    ring.orders.map(order ⇒ {
+    ring.orders.foreach { order ⇒
       assert(order.hash.nonEmpty)
 
       val tokenFee = if (order.feeToken.nonEmpty) order.feeToken else lrcAddress
@@ -99,7 +99,7 @@ private[lib] class RingSerializerHelper(lrcAddress: String, ring: Ring) {
           orderSpendableFeeMap += order.hash -> numSpendables
           numSpendables += 1
       }
-    })
+    }
 
     numSpendables
   }

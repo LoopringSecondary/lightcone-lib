@@ -57,9 +57,7 @@ private[lib] class RingDeserializerHelper(lrcAddress: String, encoded: String) {
     val ringDataPtr = orderDataPtr + (25 * numOrders) * 2
     val dataBlobPtr = ringDataPtr + (numRings * 9) + 32
 
-    (1 to numSpendables).map(_ ⇒ {
-      spendableList +:= undefined
-    })
+    (1 to numSpendables).foreach(_ ⇒ spendableList +:= undefined)
 
     dataOffset = dataBlobPtr
     tableOffset = miningDataPtr
@@ -89,21 +87,21 @@ private[lib] class RingDeserializerHelper(lrcAddress: String, encoded: String) {
   private def assembleRings(numRings: Int, originOffset: Int, orders: Seq[Order]): Seq[Seq[Int]] = {
     var offset = originOffset
 
-    (1 to numRings).map(_ ⇒ {
+    (1 to numRings).map { _ ⇒
       val ringsize = dataparser.extractUint8(offset)
       val ring = assembleRing(ringsize, offset + 1, orders)
       offset += 1 + 8
       ring
-    })
+    }
   }
 
   private def assembleRing(ringsize: Int, originOffset: Int, orders: Seq[Order]): Seq[Int] = {
     var offset = originOffset
-    (1 to ringsize).map(_ ⇒ {
+    (1 to ringsize).map { _ ⇒
       val orderidx = dataparser.extractUint8(offset)
       offset += 1
       orderidx
-    })
+    }
   }
 
   private def assembleOrder(): Order = {
@@ -133,21 +131,24 @@ private[lib] class RingDeserializerHelper(lrcAddress: String, encoded: String) {
     val _tokenRecipient = nextAddress
     val _walletSplitPercentage = nextUint16
 
+    val finalFeeToken = if (_feeToken.equals(undefined)) lrcAddress else _feeToken
+    val finalTokenRecipient = if (_tokenRecipient.equals(undefined)) _owner else _tokenRecipient
+
     Order(
       owner = _owner,
       tokenS = _tokenS,
       tokenB = _tokenB,
-      amountS = _amountS.hex2BigInt,
-      amountB = _amountB.hex2BigInt,
+      amountS = _amountS,
+      amountB = _amountB,
       validSince = _validSince,
       validUntil = _validUntil,
       dualAuthAddress = _dualAuthAddr,
       wallet = _walletAddr,
       allOrNone = _allOrNone,
-      feeToken = if (_feeToken.equals(undefined)) lrcAddress else _feeToken,
-      feeAmount = _feeAmount.hex2BigInt,
+      feeToken = finalFeeToken,
+      feeAmount = _feeAmount,
       feePercentage = _feePercentage,
-      tokenReceipt = if (_tokenRecipient.equals(undefined)) _owner else _tokenRecipient,
+      tokenReceipt = finalTokenRecipient,
       walletSplitPercentage = _walletSplitPercentage,
       hash = "",
       sig = _sig,
@@ -158,8 +159,8 @@ private[lib] class RingDeserializerHelper(lrcAddress: String, encoded: String) {
       tokenSFeePercentage = _tokenSFeePercentage,
       tokenBFeePercentage = _tokenBFeePercentage,
       version = _version,
-      tokenSpendableS = _tokenSpendableS.hex2BigInt,
-      tokenSpendableFee = _tokenSpendableFee.hex2BigInt
+      tokenSpendableS = _tokenSpendableS,
+      tokenSpendableFee = _tokenSpendableFee
     )
   }
 

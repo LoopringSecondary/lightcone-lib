@@ -22,9 +22,9 @@ import org.web3j.utils.Numeric
 
 package object lib {
 
-  implicit class RichString(src: String) {
+  implicit def hexString2BigInt(hex: String): BigInt = Numeric.toBigInt(hex)
 
-    def hex2BigInt: BigInt = Numeric.toBigInt(src)
+  implicit class RichString(src: String) {
 
     def safeeq(that: String): Boolean = src.toLowerCase == that.toLowerCase
 
