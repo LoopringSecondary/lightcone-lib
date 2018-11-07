@@ -17,11 +17,11 @@
 package org.loopring.lightcone.lib
 
 case class Ring(
-    feeReceipt: Address,
-    miner: Address,
+    feeReceipt: String,
+    miner: String,
     sig: String,
     ringOrderIndex: Seq[Seq[Int]], // todo change to map
     orders: Seq[Order],
-    hash: Hash,
-    transactionOrigin: Address
+    hash: String,
+    transactionOrigin: String
 )

@@ -18,22 +18,17 @@ package org.loopring.lightcone
 
 import org.web3j.utils.Numeric
 
+// todo lib里面是否需要定义amount,address,hash等数据结构,与core项目的amount等该如何调用
+
 package object lib {
-  type Amount = BigInt
-  type Address = String
-  type Hash = String
-  type TimeStamp = Long
 
-  implicit class RichHex(src: String) {
+  implicit class RichString(src: String) {
 
-    def asAmount: Amount = Numeric.toBigInt(src)
-  }
+    def hex2BigInt: BigInt = Numeric.toBigInt(src)
 
-  implicit class RichAddress(src: Address) {
+    def safeeq(that: String): Boolean = src.toLowerCase == that.toLowerCase
 
-    def safeeq(that: Address): Boolean = src.toLowerCase == that.toLowerCase
-    def safeneq(that: Address): Boolean = src.toLowerCase != that.toLowerCase
+    def safeneq(that: String): Boolean = src.toLowerCase != that.toLowerCase
 
   }
-
 }

@@ -121,15 +121,15 @@ case class RingsDeserializer(lrcAddress: String, encoded: String) {
       owner = _owner,
       tokenS = _tokenS,
       tokenB = _tokenB,
-      amountS = _amountS.asAmount,
-      amountB = _amountB.asAmount,
+      amountS = _amountS.hex2BigInt,
+      amountB = _amountB.hex2BigInt,
       validSince = _validSince,
       validUntil = _validUntil,
       dualAuthAddress = _dualAuthAddr,
       wallet = _walletAddr,
       allOrNone = _allOrNone,
       feeToken = if (_feeToken.equals(undefined)) lrcAddress else _feeToken,
-      feeAmount = _feeAmount.asAmount,
+      feeAmount = _feeAmount.hex2BigInt,
       feePercentage = _feePercentage,
       tokenReceipt = if (_tokenRecipient.equals(undefined)) _owner else _tokenRecipient,
       walletSplitPercentage = _walletSplitPercentage,
@@ -142,8 +142,8 @@ case class RingsDeserializer(lrcAddress: String, encoded: String) {
       tokenSFeePercentage = _tokenSFeePercentage,
       tokenBFeePercentage = _tokenBFeePercentage,
       version = _version,
-      tokenSpendableS = _tokenSpendableS.asAmount,
-      tokenSpendableFee = _tokenSpendableFee.asAmount
+      tokenSpendableS = _tokenSpendableS.hex2BigInt,
+      tokenSpendableFee = _tokenSpendableFee.hex2BigInt
     )
   }
 

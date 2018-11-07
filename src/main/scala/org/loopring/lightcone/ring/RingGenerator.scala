@@ -20,17 +20,19 @@ import scala.collection.mutable.{ HashMap ⇒ HMap }
 
 // warning: 代码顺序不能调整！！！！！！
 case class RingGenerator(
-    lrcAddress: Address,
+    lrcAddress: String,
     ringsInfo: Ring
 ) {
 
   val ORDER_VERSION = 0
   val SERIALIZATION_VERSION = 0
 
+  ringsInfo.orders.map(x ⇒ assert(x.hash.nonEmpty))
+
   var datastream = BitStream()
   var tablestream = BitStream()
-  var orderSpendableSMap = HMap.empty[Hash, Int]
-  var orderSpendableFeeMap = HMap.empty[Hash, Int]
+  var orderSpendableSMap = HMap.empty[String, Int]
+  var orderSpendableFeeMap = HMap.empty[String, Int]
 
   def toSubmitableParam(): String = {
     val numSpendables = setupSpendables()
