@@ -68,8 +68,8 @@ class RingDataSpec extends FlatSpec with Matchers {
     dualAuthSig = "0x00411bba3a7913e9a1548067741e6c8652ad7d3803fc970ab53314236f63176f205bd06680de1295a94b130075b056f8f08e18b6c26f26e1288e0ce7660410daf54d60"
   )
 
-  "generate" should "get ring data" in {
-    info("execute cmd [sbt lib/'testOnly *RingSubmitterSpec -- -z submitRings'] to test single spec of submitRings")
+  "serialize" should "get ring data" in {
+    info("[sbt lib/'testOnly *RingDataSpec -- -z serialize']")
 
     val ring = Ring(
       orders = Seq(order1, order2),
@@ -87,6 +87,7 @@ class RingDataSpec extends FlatSpec with Matchers {
   }
 
   "deserialize" should "parse ring to orders" in {
+    info("[sbt lib/'testOnly *RingDataSpec -- -z deserialize']")
     // val ringhash = "0x6cacf9c57af230d0d1d75364196dc144f049b23138200586a7e8d7e467e9355c"
     val result = deserializer.deserialize(originInput)
 

@@ -190,7 +190,8 @@ private[lib] class RingSerializerHelper(lrcAddress: String, ring: Ring) {
       insertDefault()
     }
 
-    tablestream.addUint16(if (order.allOrNone) 1 else 0)
+    val allOrNone = if (order.allOrNone) 1 else 0
+    tablestream.addUint16(allOrNone)
 
     if (order.feeToken.nonEmpty && (order.feeToken safeneq lrcAddress)) {
       insertOffset(datastream.addAddress(order.feeToken))
@@ -204,10 +205,17 @@ private[lib] class RingSerializerHelper(lrcAddress: String, ring: Ring) {
       insertDefault()
     }
 
-    tablestream.addUint16(if (order.feePercentage > 0) order.feePercentage else 0)
-    tablestream.addUint16(if (order.waiveFeePercentage > 0) order.waiveFeePercentage else 0)
-    tablestream.addUint16(if (order.tokenSFeePercentage > 0) order.tokenSFeePercentage else 0)
-    tablestream.addUint16(if (order.tokenBFeePercentage > 0) order.tokenBFeePercentage else 0)
+    val feePercentage = if (order.feePercentage > 0) order.feePercentage else 0
+    tablestream.addUint16(feePercentage)
+
+    val waiveFeePercentage = if (order.waiveFeePercentage > 0) order.waiveFeePercentage else 0
+    tablestream.addUint16(waiveFeePercentage)
+
+    val tokenSFeePercentage = if (order.tokenSFeePercentage > 0) order.tokenSFeePercentage else 0
+    tablestream.addUint16(tokenSFeePercentage)
+
+    val tokenBFeePercentage = if (order.tokenBFeePercentage > 0) order.tokenBFeePercentage else 0
+    tablestream.addUint16(tokenBFeePercentage)
 
     if (order.tokenReceipt.nonEmpty && (order.tokenReceipt safeneq order.owner)) {
       insertOffset(datastream.addAddress(order.tokenReceipt))
@@ -215,7 +223,8 @@ private[lib] class RingSerializerHelper(lrcAddress: String, ring: Ring) {
       insertDefault()
     }
 
-    tablestream.addUint16(if (order.walletSplitPercentage > 0) order.walletSplitPercentage else 0)
+    val walletSplitPercentage = if (order.walletSplitPercentage > 0) order.walletSplitPercentage else 0
+    tablestream.addUint16(walletSplitPercentage)
   }
 
   private def createBytes(data: String): String = {
