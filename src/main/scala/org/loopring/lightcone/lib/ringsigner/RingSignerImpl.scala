@@ -28,12 +28,13 @@ class RingSignerImpl(
     privateKey: String = "0x",
     feeReceipt: String = "",
     lrcAddress: String = "0xef68e7c694f40c8202821edf525de3782458639f"
+)(
+    implicit
+    nonceProvider: NonceProvider
 ) extends RingSigner {
   //防止一个tx中的订单过多，超过 gaslimit
   val maxRingsInOneTx = 5
   val credentials: Credentials = Credentials.create(privateKey)
-
-  var currentNonce = new AtomicInteger(1) //todo: 启动时,nonce需要初始化,
 
   implicit val ringSerializer = new RingSerializerImpl(lrcAddress)
 
@@ -56,7 +57,7 @@ class RingSignerImpl(
 
   def generateTxData(inputData: String): Array[Byte] = {
     val rawTransaction = RawTransaction.createTransaction(
-      BigInt(currentNonce.getAndIncrement()).bigInteger,
+      nonceProvider.getAndIncNonce(credentials.getAddress).bigInteger,
       BigInt(0).bigInteger, //todo:需要确定gasprice和gaslimit
       BigInt(0).bigInteger,
       protocol,
