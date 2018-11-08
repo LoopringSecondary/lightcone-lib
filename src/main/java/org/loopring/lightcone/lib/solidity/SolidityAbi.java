@@ -37,19 +37,19 @@ import static org.apache.commons.lang3.ArrayUtils.subarray;
 import static org.apache.commons.lang3.StringUtils.join;
 import static org.apache.commons.lang3.StringUtils.stripEnd;
 
-import static org.loopring.lightcone.lib.solidity.HashUtil.sha3;
+import static org.loopring.lightcone.lib.solidity.SolidityHashUtil.sha3;
 import static org.loopring.lightcone.lib.solidity.SolidityType.IntType.decodeInt;
 import static org.loopring.lightcone.lib.solidity.SolidityType.IntType.encodeInt;
 
-public class Abi extends ArrayList<Abi.Entry> {
+public class SolidityAbi extends ArrayList<SolidityAbi.Entry> {
     private static final ObjectMapper DEFAULT_MAPPER =
             new ObjectMapper()
                     .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                     .enable(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL);
 
-    public static Abi fromJson(String json) {
+    public static SolidityAbi fromJson(String json) {
         try {
-            return DEFAULT_MAPPER.readValue(json, Abi.class);
+            return DEFAULT_MAPPER.readValue(json, SolidityAbi.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -63,22 +63,22 @@ public class Abi extends ArrayList<Abi.Entry> {
         }
     }
 
-    private <T extends Abi.Entry> T find(
-            Class<T> resultClass, final Abi.Entry.Type type, final Predicate<T> searchPredicate) {
+    private <T extends SolidityAbi.Entry> T find(
+            Class<T> resultClass, final SolidityAbi.Entry.Type type, final Predicate<T> searchPredicate) {
         return (T)
                 CollectionUtils.find(
                         this, entry -> entry.type == type && searchPredicate.evaluate((T) entry));
     }
 
     public Function findFunction(Predicate<Function> searchPredicate) {
-        return find(Function.class, Abi.Entry.Type.function, searchPredicate);
+        return find(Function.class, SolidityAbi.Entry.Type.function, searchPredicate);
     }
 
     public Event findEvent(Predicate<Event> searchPredicate) {
-        return find(Event.class, Abi.Entry.Type.event, searchPredicate);
+        return find(Event.class, SolidityAbi.Entry.Type.event, searchPredicate);
     }
 
-    public Abi.Constructor findConstructor() {
+    public SolidityAbi.Constructor findConstructor() {
         return find(Constructor.class, Entry.Type.constructor, object -> true);
     }
 
@@ -140,9 +140,9 @@ public class Abi extends ArrayList<Abi.Entry> {
                 Boolean anonymous,
                 Boolean constant,
                 String name,
-                List<Param> inputs,
-                List<Param> outputs,
-                Type type,
+                List<SolidityAbi.Entry.Param> inputs,
+                List<SolidityAbi.Entry.Param> outputs,
+                SolidityAbi.Entry.Type type,
                 Boolean payable) {
             this.anonymous = anonymous;
             this.constant = constant;
@@ -155,7 +155,7 @@ public class Abi extends ArrayList<Abi.Entry> {
 
         public String formatSignature() {
             StringBuilder paramsTypes = new StringBuilder();
-            for (Abi.Entry.Param param : inputs) {
+            for (SolidityAbi.Entry.Param param : inputs) {
                 paramsTypes.append(param.type.getCanonicalName()).append(",");
             }
             return format("%s(%s)", name, stripEnd(paramsTypes.toString(), ","));
@@ -198,7 +198,7 @@ public class Abi extends ArrayList<Abi.Entry> {
 
     public static class Constructor extends Entry {
 
-        public Constructor(List<Param> inputs, List<Param> outputs) {
+        public Constructor(List<SolidityAbi.Entry.Param> inputs, List<SolidityAbi.Entry.Param> outputs) {
             super(null, null, "", inputs, outputs, Type.constructor, false);
         }
 
@@ -216,7 +216,7 @@ public class Abi extends ArrayList<Abi.Entry> {
         private static final int ENCODED_SIGN_LENGTH = 4;
 
         public Function(
-                boolean constant, String name, List<Param> inputs, List<Param> outputs, Boolean payable) {
+                boolean constant, String name, List<SolidityAbi.Entry.Param> inputs, List<SolidityAbi.Entry.Param> outputs, Boolean payable) {
             super(null, constant, name, inputs, outputs, Type.function, payable);
         }
 
@@ -293,7 +293,7 @@ public class Abi extends ArrayList<Abi.Entry> {
 
     public static class Event extends Entry {
 
-        public Event(boolean anonymous, String name, List<Param> inputs, List<Param> outputs) {
+        public Event(boolean anonymous, String name, List<SolidityAbi.Entry.Param> inputs, List<SolidityAbi.Entry.Param> outputs) {
             super(anonymous, null, name, inputs, outputs, Type.event, false);
         }
 
@@ -311,7 +311,7 @@ public class Abi extends ArrayList<Abi.Entry> {
             return result;
         }
 
-        private List<Param> filteredInputs(final boolean indexed) {
+        private List<SolidityAbi.Entry.Param> filteredInputs(final boolean indexed) {
             return select(inputs, param -> param.indexed == indexed);
         }
 
