@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.loopring.lightcone.lib.solidity;
+package org.loopring.lightcone.lib;
 
 import org.ethereum.crypto.jce.SpongyCastleProvider;
 import org.ethereum.util.RLP;
@@ -34,10 +34,10 @@ import java.util.Random;
 import static java.util.Arrays.copyOfRange;
 import static org.ethereum.util.ByteUtil.EMPTY_BYTE_ARRAY;
 
-public class HashUtil {
+public class SolidityHashUtil {
 
     private static final Logger LOG =
-            LoggerFactory.getLogger(org.loopring.lightcone.lib.solidity.HashUtil.class);
+            LoggerFactory.getLogger(SolidityHashUtil.class);
 
     public static final byte[] EMPTY_DATA_HASH;
     public static final byte[] EMPTY_LIST_HASH;
