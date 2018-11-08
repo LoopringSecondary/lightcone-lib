@@ -74,7 +74,6 @@ private[lib] class RingDeserializerHelper(lrcAddress: String, encoded: String) {
       sig = _sig,
       orders = _orders,
       ringOrderIndex = _rings,
-      hash = "",
       transactionOrigin = ""
     )
   }
