@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.loopring.lightcone.lib;
+package org.loopring.lightcone.lib.solidity;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -37,9 +37,9 @@ import static org.apache.commons.lang3.ArrayUtils.subarray;
 import static org.apache.commons.lang3.StringUtils.join;
 import static org.apache.commons.lang3.StringUtils.stripEnd;
 
-import static org.loopring.lightcone.lib.SolidityHashUtil.sha3;
-import static org.loopring.lightcone.lib.SolidityType.IntType.decodeInt;
-import static org.loopring.lightcone.lib.SolidityType.IntType.encodeInt;
+import static org.loopring.lightcone.lib.solidity.SolidityHashUtil.sha3;
+import static org.loopring.lightcone.lib.solidity.SolidityType.IntType.decodeInt;
+import static org.loopring.lightcone.lib.solidity.SolidityType.IntType.encodeInt;
 
 public class SolidityAbi extends ArrayList<SolidityAbi.Entry> {
     private static final ObjectMapper DEFAULT_MAPPER =
