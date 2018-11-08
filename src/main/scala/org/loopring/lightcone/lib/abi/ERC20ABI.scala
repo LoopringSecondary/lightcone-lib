@@ -14,22 +14,8 @@
  * limitations under the License.
  */
 
-package org.loopring.lightcone
+package org.loopring.lightcone.lib
 
-import org.web3j.utils.Numeric
+class ERC20ABI(abiJson: String) extends ABI(abiJson) {
 
-// todo lib里面是否需要定义amount,address,hash等数据结构,与core项目的amount等该如何调用
-
-package object lib {
-
-  implicit def bytes2BigInt(bytes: Array[Byte]): BigInt = Numeric.toBigInt(bytes)
-  implicit def hexString2BigInt(hex: String): BigInt = Numeric.toBigInt(hex)
-
-  implicit class RichString(src: String) {
-
-    def safeeq(that: String): Boolean = src.toLowerCase == that.toLowerCase
-
-    def safeneq(that: String): Boolean = src.toLowerCase != that.toLowerCase
-
-  }
 }
