@@ -22,13 +22,13 @@ import org.web3j.crypto._
 import org.web3j.tx.ChainId
 import org.web3j.utils.Numeric
 
-class RingSubmitterImpl(
+class RingSignerImpl(
     protocol: String = "",
     chainId: Byte = 0.toByte,
     privateKey: String = "0x",
     feeReceipt: String = "",
     lrcAddress: String = "0xef68e7c694f40c8202821edf525de3782458639f"
-) extends RingSubmitter {
+) extends RingSigner {
   //防止一个tx中的订单过多，超过 gaslimit
   val maxRingsInOneTx = 5
   val credentials: Credentials = Credentials.create(privateKey)
@@ -37,7 +37,7 @@ class RingSubmitterImpl(
 
   implicit val ringSerializer = new RingSerializerImpl(lrcAddress)
 
-  def getSubmitterAddress(): String = credentials.getAddress
+  def getSignerAddress(): String = credentials.getAddress
 
   def generateInputData(ring: Ring): String = {
     val signatureData = Sign.signMessage(

@@ -16,8 +16,8 @@
 
 package org.loopring.lightcone.lib
 
-trait RingSubmitter {
+trait RingSigner {
   def generateInputData(ring: Ring): String
   def generateTxData(inputData: String): Array[Byte]
-  def getSubmitterAddress(): String
+  def getSignerAddress(): String
 }
