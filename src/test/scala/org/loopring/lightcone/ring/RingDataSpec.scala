@@ -77,8 +77,7 @@ class RingDataSpec extends FlatSpec with Matchers {
       miner = "0xf357eb986926808b113c79ba5975dc1bae1fba79",
       transactionOrigin = "0x73d8f963642a21663e7617f796c75c99804b9e3b",
       sig = "0x00411ce2bb66d38d0ffd98d73abdfc12563aee1b993e5c9a1d6b87bf9491c0ca2dd8c55aad23ddc053ad4f6ecf0513d857147d9f7445127607e502214a82d9854dc72b",
-      ringOrderIndex = Seq(Seq(0, 1)),
-      hash = "0x6cacf9c57af230d0d1d75364196dc144f049b23138200586a7e8d7e467e9355c"
+      ringOrderIndex = Seq(Seq(0, 1))
     )
 
     val result = generator.serialize(ring)
