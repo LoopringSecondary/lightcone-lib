@@ -18,6 +18,6 @@ package org.loopring.lightcone.lib
 
 trait RingSigner {
   def generateInputData(ring: Ring): String
-  def generateTxData(inputData: String): Array[Byte]
+  def generateTxData(inputData: String, nonce: BigInt): Array[Byte]
   def getSignerAddress(): String
 }
