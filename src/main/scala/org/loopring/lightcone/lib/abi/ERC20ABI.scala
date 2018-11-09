@@ -16,6 +16,82 @@
 
 package org.loopring.lightcone.lib
 
-class ERC20ABI(abiJson: String) extends ABI(abiJson) {
+case class Transfer(sender: String, receiver: String, amount: BigInt)
+case class Approve(owner: String, spender: String, amount: BigInt)
+
+class ERC20ABI(abiJson: String) extends AbiWrapp(abiJson) {
+
+  val FN_TRANSFER = "transfer"
+  val FN_TRANSFER_FROM = "transferFrom"
+  val FN_APPROVE = "approve"
+  val EN_TRANSFER = "Transfer"
+  val EN_APPROVAL = "Approval"
+
+  def decodeAndAssemble(tx: Transaction): Any = {
+    val result = decode(tx.input)
+    result.name match {
+      case FN_TRANSFER      ⇒ assembleTransferFunction(result.list, tx.from)
+      case FN_TRANSFER_FROM ⇒ assembleTransferFromFunction(result.list)
+      case FN_APPROVE       ⇒ assembleApproveFunction(result.list, tx.from)
+    }
+  }
+
+  def decodeAndAssemble(log: TransactionLog, tx: Transaction): Any = {
+    val result = decode(log)
+    result.name match {
+      case EN_APPROVAL ⇒ assembleTransferEvent(result.list)
+      case EN_APPROVAL ⇒ assembleApprovalEvent(result.list)
+    }
+  }
+
+  private[lib] def assembleTransferFunction(list: Seq[Any], from: String): Transfer = {
+    assert(list.length == 2, "length of transfer function invalid")
+
+    Transfer(
+      receiver = scalaAny2Hex(list(0)),
+      amount = scalaAny2Hex(list(1)),
+      sender = from
+    )
+  }
+
+  private[lib] def assembleTransferFromFunction(list: Seq[Any]): Transfer = {
+    assert(list.length == 3, "length of transfer from function invalid")
+
+    Transfer(
+      sender = scalaAny2Hex(list(0)),
+      receiver = scalaAny2Hex(list(1)),
+      amount = scalaAny2Hex(list(2))
+    )
+  }
+
+  private[lib] def assembleTransferEvent(list: Seq[Any]): Transfer = {
+    assert(list.length == 3, "length of transfer event invalid")
+
+    Transfer(
+      sender = scalaAny2Hex(list(0)),
+      receiver = scalaAny2Hex(list(1)),
+      amount = scalaAny2Hex(list(2))
+    )
+  }
+
+  private[lib] def assembleApproveFunction(list: Seq[Any], from: String): Approve = {
+    assert(list.length == 2, "length of approve function invalid")
+
+    Approve(
+      owner = from,
+      spender = scalaAny2Hex(list(0)),
+      amount = scalaAny2Bigint(list(1))
+    )
+  }
+
+  private[lib] def assembleApprovalEvent(list: Seq[Any]): Approve = {
+    assert(list.length == 3, "length of approve event invalid")
+
+    Approve(
+      owner = scalaAny2Hex(list(0)),
+      spender = scalaAny2Hex(list(1)),
+      amount = scalaAny2Bigint(list(2))
+    )
+  }
 
 }
