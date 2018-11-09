@@ -88,8 +88,8 @@ abstract class AbiWrapp(abiJson: String) {
     }
   }
 
-  def decodeAndAssemble(tx: Transaction): Any
-  def decodeAndAssemble(log: TransactionLog, tx: Transaction): Any
+  def decodeAndAssemble(tx: Transaction): Option[Any]
+  def decodeAndAssemble(tx: Transaction, log: TransactionLog): Option[Any]
 
   // 这里比较特殊 涉及到任意类型的强制转换 只有abi转换时用到 所以放到该接口
   def javaObj2Hex(src: Object): String = src match {

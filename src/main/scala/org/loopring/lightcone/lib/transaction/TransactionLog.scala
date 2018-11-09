@@ -16,16 +16,14 @@
 
 package org.loopring.lightcone.lib
 
-import org.springframework.expression.spel.ast.BooleanLiteral
-
 case class TransactionLog(
-    logIndex: Int,
-    blockNumber: BigInt,
-    blockHash: String,
-    transactionHash: String,
-    transactionIndex: Int,
-    address: String,
-    data: String,
-    topics: Seq[String],
-    removed: BooleanLiteral
+    logIndex: Int = 0,
+    blockNumber: BigInt = 0,
+    blockHash: String = "0x",
+    transactionHash: String = "0x",
+    transactionIndex: Int = 0,
+    address: String = "0x",
+    data: String = "0x",
+    topics: Seq[String] = Seq(),
+    removed: Boolean = false
 )

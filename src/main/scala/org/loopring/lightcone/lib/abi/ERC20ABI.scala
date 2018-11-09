@@ -27,20 +27,20 @@ class ERC20ABI(abiJson: String) extends AbiWrapp(abiJson) {
   val EN_TRANSFER = "Transfer"
   val EN_APPROVAL = "Approval"
 
-  def decodeAndAssemble(tx: Transaction): Any = {
+  def decodeAndAssemble(tx: Transaction): Option[Any] = {
     val result = decode(tx.input)
     result.name match {
-      case FN_TRANSFER      ⇒ assembleTransferFunction(result.list, tx.from)
-      case FN_TRANSFER_FROM ⇒ assembleTransferFromFunction(result.list)
-      case FN_APPROVE       ⇒ assembleApproveFunction(result.list, tx.from)
+      case FN_TRANSFER      ⇒ Some(assembleTransferFunction(result.list, tx.from))
+      case FN_TRANSFER_FROM ⇒ Some(assembleTransferFromFunction(result.list))
+      case FN_APPROVE       ⇒ Some(assembleApproveFunction(result.list, tx.from))
     }
   }
 
-  def decodeAndAssemble(log: TransactionLog, tx: Transaction): Any = {
+  def decodeAndAssemble(tx: Transaction, log: TransactionLog): Option[Any] = {
     val result = decode(log)
     result.name match {
-      case EN_APPROVAL ⇒ assembleTransferEvent(result.list)
-      case EN_APPROVAL ⇒ assembleApprovalEvent(result.list)
+      case EN_TRANSFER ⇒ Some(assembleTransferEvent(result.list))
+      case EN_APPROVAL ⇒ Some(assembleApprovalEvent(result.list))
     }
   }
 
@@ -48,9 +48,9 @@ class ERC20ABI(abiJson: String) extends AbiWrapp(abiJson) {
     assert(list.length == 2, "length of transfer function invalid")
 
     Transfer(
+      sender = from,
       receiver = scalaAny2Hex(list(0)),
-      amount = scalaAny2Hex(list(1)),
-      sender = from
+      amount = scalaAny2Bigint(list(1))
     )
   }
 
@@ -60,7 +60,7 @@ class ERC20ABI(abiJson: String) extends AbiWrapp(abiJson) {
     Transfer(
       sender = scalaAny2Hex(list(0)),
       receiver = scalaAny2Hex(list(1)),
-      amount = scalaAny2Hex(list(2))
+      amount = scalaAny2Bigint(list(2))
     )
   }
 
@@ -70,7 +70,7 @@ class ERC20ABI(abiJson: String) extends AbiWrapp(abiJson) {
     Transfer(
       sender = scalaAny2Hex(list(0)),
       receiver = scalaAny2Hex(list(1)),
-      amount = scalaAny2Hex(list(2))
+      amount = scalaAny2Bigint(list(2))
     )
   }
 
