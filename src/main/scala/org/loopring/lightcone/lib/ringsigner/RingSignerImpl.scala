@@ -16,8 +16,6 @@
 
 package org.loopring.lightcone.lib
 
-import java.util.concurrent.atomic.AtomicInteger
-
 import org.web3j.crypto._
 import org.web3j.tx.ChainId
 import org.web3j.utils.Numeric
@@ -28,12 +26,9 @@ class RingSignerImpl(
     privateKey: String = "0x",
     feeReceipt: String = "",
     lrcAddress: String = "0xef68e7c694f40c8202821edf525de3782458639f"
-)(
-    implicit
-    nonceProvider: NonceProvider
 ) extends RingSigner {
   //防止一个tx中的订单过多，超过 gaslimit
-  val maxRingsInOneTx = 5
+  val maxRingsInOneTx = 10
   val credentials: Credentials = Credentials.create(privateKey)
 
   implicit val ringSerializer = new RingSerializerImpl(lrcAddress)
@@ -55,9 +50,9 @@ class RingSignerImpl(
     lRing.getInputData()
   }
 
-  def generateTxData(inputData: String): Array[Byte] = {
+  def generateTxData(inputData: String, nonce: BigInt): Array[Byte] = {
     val rawTransaction = RawTransaction.createTransaction(
-      nonceProvider.getAndIncNonce(credentials.getAddress).bigInteger,
+      nonce.bigInteger,
       BigInt(0).bigInteger, //todo:需要确定gasprice和gaslimit
       BigInt(0).bigInteger,
       protocol,
