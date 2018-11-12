@@ -27,8 +27,6 @@ class RingSignerImpl(
     feeReceipt: String = "",
     lrcAddress: String = "0xef68e7c694f40c8202821edf525de3782458639f"
 ) extends RingSigner {
-  //防止一个tx中的订单过多，超过 gaslimit
-  val maxRingsInOneTx = 10
   val credentials: Credentials = Credentials.create(privateKey)
 
   implicit val ringSerializer = new RingSerializerImpl(lrcAddress)
