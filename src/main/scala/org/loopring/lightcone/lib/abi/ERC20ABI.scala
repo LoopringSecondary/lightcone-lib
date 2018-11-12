@@ -19,7 +19,7 @@ package org.loopring.lightcone.lib
 case class Transfer(sender: String, receiver: String, amount: BigInt)
 case class Approve(owner: String, spender: String, amount: BigInt)
 
-class ERC20ABI(abiJson: String) extends AbiWrapp(abiJson) {
+class ERC20ABI(abiJson: String) extends AbiWrap(abiJson) {
 
   val FN_TRANSFER = "transfer"
   val FN_TRANSFER_FROM = "transferFrom"

@@ -24,7 +24,7 @@ import org.loopring.lightcone.lib.solidity.{ SolidityAbi ⇒ SABI }
 
 import scala.collection.mutable.{ HashMap ⇒ MMap }
 
-abstract class AbiWrapp(abiJson: String) {
+abstract class AbiWrap(abiJson: String) {
 
   val abi: SABI = SABI.fromJson(abiJson)
   val functionSignatureLength = 8
