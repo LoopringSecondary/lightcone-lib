@@ -32,6 +32,10 @@ case class ByteStream() {
     }
   }
 
+  def getBytes: Array[Byte] = {
+    return Numeric.hexStringToByteArray(data)
+  }
+
   /////////////////////////
   // functions for pack
   //
