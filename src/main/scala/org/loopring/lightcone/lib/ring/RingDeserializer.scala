@@ -54,7 +54,7 @@ private[lib] class RingDeserializerHelper(lrcAddress: String, encoded: String) {
 
     val miningDataPtr = 8
     val orderDataPtr = miningDataPtr + 3 * 2
-    val ringDataPtr = orderDataPtr + (25 * numOrders) * 2
+    val ringDataPtr = orderDataPtr + (24 * numOrders) * 2
     val dataBlobPtr = ringDataPtr + (numRings * 9) + 32
 
     (1 to numSpendables).foreach(_ ⇒ spendableList +:= undefined)
@@ -104,7 +104,7 @@ private[lib] class RingDeserializerHelper(lrcAddress: String, encoded: String) {
   }
 
   private def assembleOrder(): Order = {
-    val _version = nextUint16.toString
+    val _version = nextUint16
     val _owner = nextAddress
     val _tokenS = nextAddress
     val _tokenB = nextAddress
@@ -123,7 +123,6 @@ private[lib] class RingDeserializerHelper(lrcAddress: String, encoded: String) {
     val _allOrNone = nextUint16 > 0
     val _feeToken = nextAddress
     val _feeAmount = Numeric.toHexString(nextUint.toByteArray)
-    val _feePercentage = nextUint16
     val _waiveFeePercentage = toInt16(nextUint16)
     val _tokenSFeePercentage = nextUint16
     val _tokenBFeePercentage = nextUint16
@@ -146,7 +145,6 @@ private[lib] class RingDeserializerHelper(lrcAddress: String, encoded: String) {
       allOrNone = _allOrNone,
       feeToken = finalFeeToken,
       feeAmount = _feeAmount,
-      feePercentage = _feePercentage,
       tokenReceipt = finalTokenRecipient,
       walletSplitPercentage = _walletSplitPercentage,
       hash = "",

@@ -26,21 +26,21 @@ case class Order(
     amountS: BigInt,
     amountB: BigInt,
     validSince: Long,
-    dualAuthAddress: String,
-    wallet: String,
     allOrNone: Boolean,
     feeToken: String,
     feeAmount: BigInt,
     tokenReceipt: String,
-    walletSplitPercentage: Int,
     sig: String,
     dualAuthSig: String,
     // option
+    hash: String = "",
     validUntil: Long = 0,
+    wallet: String = "0x0",
+    dualAuthAddress: String = "0x0",
     broker: String = "0x0",
     orderInterceptor: String = "0x0",
-    version: String = "0",
-    feePercentage: Int = 0,
+    version: Int = 0,
+    walletSplitPercentage: Int = 0,
     tokenSFeePercentage: Int = 0,
     tokenBFeePercentage: Int = 0,
     waiveFeePercentage: Int = 0,
@@ -49,7 +49,8 @@ case class Order(
     brokerSpendableS: BigInt = 0,
     brokerSpendableFee: BigInt = 0,
 ) {
-  def hash:String = {
+
+  def generateHash: String = {
     val data = ByteStream()
     data.addUint(amountS)
     data.addUint(amountB)
@@ -66,7 +67,6 @@ case class Order(
     data.addAddress(tokenReceipt)
     data.addAddress(feeToken)
     data.addUint16(walletSplitPercentage)
-    data.addUint16(feePercentage)
     data.addUint16(tokenSFeePercentage)
     data.addUint16(tokenBFeePercentage)
     data.addBoolean(allOrNone)
