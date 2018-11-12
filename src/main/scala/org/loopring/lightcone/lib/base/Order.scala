@@ -16,6 +16,9 @@
 
 package org.loopring.lightcone.lib
 
+import org.web3j.crypto.{ Hash ⇒ web3Hash }
+import org.web3j.utils.Numeric
+
 case class Order(
     owner: String,
     tokenS: String,
@@ -31,7 +34,6 @@ case class Order(
     feePercentage: Int,
     tokenReceipt: String,
     walletSplitPercentage: Int,
-    hash: String,
     sig: String,
     dualAuthSig: String,
     // option
@@ -46,4 +48,30 @@ case class Order(
     tokenSpendableFee: BigInt = 0,
     brokerSpendableS: BigInt = 0,
     brokerSpendableFee: BigInt = 0,
-)
+) {
+  def hash:String = {
+    val data = ByteStream()
+    data.addUint(amountS)
+    data.addUint(amountB)
+    data.addUint(feeAmount)
+    data.addUint(BigInt(validSince))
+    data.addUint(BigInt(validUntil))
+    data.addAddress(owner)
+    data.addAddress(tokenS)
+    data.addAddress(tokenB)
+    data.addAddress(dualAuthAddress)
+    data.addAddress(broker)
+    data.addAddress(orderInterceptor)
+    data.addAddress(wallet)
+    data.addAddress(tokenReceipt)
+    data.addAddress(feeToken)
+    data.addUint16(walletSplitPercentage)
+    data.addUint16(feePercentage)
+    data.addUint16(tokenSFeePercentage)
+    data.addUint16(tokenBFeePercentage)
+    data.addBoolean(allOrNone)
+
+    Numeric.toHexString(web3Hash.sha3(data.getBytes))
+  }
+
+}
