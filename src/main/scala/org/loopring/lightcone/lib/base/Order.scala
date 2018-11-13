@@ -26,21 +26,21 @@ case class Order(
     amountS: BigInt,
     amountB: BigInt,
     validSince: Long,
-    dualAuthAddress: String,
-    wallet: String,
     allOrNone: Boolean,
     feeToken: String,
     feeAmount: BigInt,
-    feePercentage: Int,
     tokenReceipt: String,
-    walletSplitPercentage: Int,
     sig: String,
     dualAuthSig: String,
     // option
+    hash: String = "",
     validUntil: Long = 0,
+    wallet: String = "0x0",
+    dualAuthAddress: String = "0x0",
     broker: String = "0x0",
     orderInterceptor: String = "0x0",
-    version: String = "0",
+    version: Int = 0,
+    walletSplitPercentage: Int = 0,
     tokenSFeePercentage: Int = 0,
     tokenBFeePercentage: Int = 0,
     waiveFeePercentage: Int = 0,
@@ -49,24 +49,24 @@ case class Order(
     brokerSpendableS: BigInt = 0,
     brokerSpendableFee: BigInt = 0,
 ) {
-  def hash:String = {
+
+  def generateHash: String = {
     val data = ByteStream()
     data.addUint(amountS)
     data.addUint(amountB)
     data.addUint(feeAmount)
     data.addUint(BigInt(validSince))
     data.addUint(BigInt(validUntil))
-    data.addAddress(owner)
-    data.addAddress(tokenS)
-    data.addAddress(tokenB)
-    data.addAddress(dualAuthAddress)
-    data.addAddress(broker)
-    data.addAddress(orderInterceptor)
-    data.addAddress(wallet)
-    data.addAddress(tokenReceipt)
-    data.addAddress(feeToken)
+    data.addAddress(owner, true)
+    data.addAddress(tokenS, true)
+    data.addAddress(tokenB, true)
+    data.addAddress(dualAuthAddress, true)
+    data.addAddress(broker,true)
+    data.addAddress(orderInterceptor, true)
+    data.addAddress(wallet, true)
+    data.addAddress(tokenReceipt, true)
+    data.addAddress(feeToken, true)
     data.addUint16(walletSplitPercentage)
-    data.addUint16(feePercentage)
     data.addUint16(tokenSFeePercentage)
     data.addUint16(tokenBFeePercentage)
     data.addBoolean(allOrNone)

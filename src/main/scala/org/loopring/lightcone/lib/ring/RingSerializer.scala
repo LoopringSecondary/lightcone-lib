@@ -205,9 +205,6 @@ private[lib] class RingSerializerHelper(lrcAddress: String, ring: Ring) {
       insertDefault()
     }
 
-    val feePercentage = if (order.feePercentage > 0) order.feePercentage else 0
-    tablestream.addUint16(feePercentage)
-
     val waiveFeePercentage = if (order.waiveFeePercentage > 0) order.waiveFeePercentage else 0
     tablestream.addUint16(waiveFeePercentage)
 
