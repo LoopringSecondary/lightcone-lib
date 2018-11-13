@@ -16,29 +16,25 @@
 
 package org.loopring.lightcone.lib
 
-import org.web3j.utils.Numeric
-import org.web3j.crypto.{ Hash ⇒ web3Hash }
+class RingSubmitterABI(jsonStr: String) extends AbiWrap(jsonStr) {
 
-case class Ring(
-    feeReceipt: String,
-    miner: String,
-    sig: String,
-    ringOrderIndex: Seq[Seq[Int]], // todo change to map
-    orders: Seq[Order],
-    transactionOrigin: String
-) {
+  val FN_SUBMIT_RING = "submitRings"
+  val EN_RING_MINED = "RingMined"
 
-  def hash: String = {
-    val stream = ByteStream()
-    orders.foreach { order ⇒
-      stream.addHex(order.hash)
-      stream.addUint16(order.waiveFeePercentage)
+  val submitRing = findFunctionByName(FN_SUBMIT_RING)
+
+  def decodeAndAssemble(tx: Transaction): Option[Any] = {
+    val result = decode(tx.input)
+    result.name match {
+      case _ ⇒ None
     }
-    Numeric.toHexString(web3Hash.sha3(stream.getBytes))
   }
 
-  def getInputData()(implicit serializer: RingSerializer): String = {
-    serializer.serialize(this)
+  def decodeAndAssemble(tx: Transaction, log: TransactionLog): Option[Any] = {
+    val result = decode(log)
+    result.name match {
+      case _ ⇒ None
+    }
   }
 
 }

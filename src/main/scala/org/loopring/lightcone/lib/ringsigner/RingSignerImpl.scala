@@ -25,7 +25,8 @@ class RingSignerImpl(
     chainId: Byte = 0.toByte,
     privateKey: String = "0x",
     feeReceipt: String = "",
-    lrcAddress: String = "0xef68e7c694f40c8202821edf525de3782458639f"
+    lrcAddress: String = "0xef68e7c694f40c8202821edf525de3782458639f",
+    methodId: String = "0x"
 ) extends RingSigner {
   val credentials: Credentials = Credentials.create(privateKey)
 
@@ -45,14 +46,16 @@ class RingSignerImpl(
       miner = credentials.getAddress,
       sig = Numeric.toHexString(sigBytes)
     )
-    lRing.getInputData()
+    val data = lRing.getInputData()
+    methodId + Numeric.cleanHexPrefix(data)
   }
 
+  // todo: gaslimit, gasprice...
   def generateTxData(inputData: String, nonce: BigInt): Array[Byte] = {
     val rawTransaction = RawTransaction.createTransaction(
       nonce.bigInteger,
-      BigInt(0).bigInteger, //todo:需要确定gasprice和gaslimit
-      BigInt(0).bigInteger,
+      BigInt("18000000000").bigInteger,
+      BigInt("6000000").bigInteger,
       protocol,
       BigInt(0).bigInteger,
       inputData
