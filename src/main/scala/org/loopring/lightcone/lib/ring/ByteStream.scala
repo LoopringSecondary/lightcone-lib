@@ -40,12 +40,12 @@ case class ByteStream() {
   // functions for pack
   //
   /////////////////////////
-  def addAddress(x: String): Int =
-    insert(Numeric.toHexStringNoPrefixZeroPadded(Numeric.toBigInt(x), addressLength * 2), false)
+  def addAddress(x: String, forceAppend: Boolean = false): Int =
+    insert(Numeric.toHexStringNoPrefixZeroPadded(Numeric.toBigInt(x), addressLength * 2), forceAppend)
 
-  def addUint8(num: BigInt): Int = addBigInt(num, 1, true)
+  def addUint8(num: BigInt, forceAppend: Boolean = true): Int = addBigInt(num, 1, forceAppend)
 
-  def addUint16(num: BigInt): Int = addBigInt(num, 2, true)
+  def addUint16(num: BigInt, forceAppend: Boolean = true): Int = addBigInt(num, 2, forceAppend)
 
   def addUint32(num: BigInt, forceAppend: Boolean = true): Int = addBigInt(num, 4, forceAppend)
 
@@ -54,13 +54,13 @@ case class ByteStream() {
   def addX(num: BigInt, numBytes: Int, forceAppend: Boolean = true): Int = addBigInt(num, numBytes, forceAppend)
 
   def addBoolean(b: Boolean, forceAppend: Boolean = true): Int =
-    insert(Numeric.toHexStringNoPrefix((if (b) BigInt(1) else BigInt(0)).bigInteger), forceAppend)
+    addBigInt(if (b) 1 else 0, 1, forceAppend)
 
   def addHex(str: String, forceAppend: Boolean = true): Int =
     insert(Numeric.cleanHexPrefix(str), forceAppend)
 
-  def addRawBytes(str: String): Int =
-    insert(Numeric.cleanHexPrefix(str), true)
+  def addRawBytes(str: String, forceAppend: Boolean = true): Int =
+    insert(Numeric.cleanHexPrefix(str), forceAppend)
 
   // todo: fuk 负数问题
   private def addBigInt(num: BigInt, numBytes: Int, forceAppend: Boolean = true): Int =
