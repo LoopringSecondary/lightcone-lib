@@ -24,14 +24,14 @@ class SubmitRingSpec extends FlatSpec with Matchers {
 
   val debug = true
 
-  val ringSubmitterAbiJsonStr = "[{\"constant\":false,\"inputs\":[{\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"submitRings\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"FEE_PERCENTAGE_BASE\",\"outputs\":[{\"name\":\"\",\"type\":\"uint16\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"_ringIndex\",\"type\":\"uint256\"},{\"indexed\":true,\"name\":\"_ringHash\",\"type\":\"bytes32\"},{\"indexed\":true,\"name\":\"_feeRecipient\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_fills\",\"type\":\"bytes\"}],\"name\":\"RingMined\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"log\",\"type\":\"string\"}],\"name\":\"LogInfo\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"_ringHash\",\"type\":\"bytes32\"}],\"name\":\"InvalidRing\",\"type\":\"event\"}]"
+  val ringSubmitterAbiJsonStr = "[{\"constant\":false,\"inputs\":[{\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"submitRings\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"FEE_PERCENTAGE_BASE\",\"outputs\":[{\"name\":\"\",\"type\":\"uint16\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"_ringIndex\",\"type\":\"uint256\"},{\"indexed\":true,\"name\":\"_ringHash\",\"type\":\"bytes32\"},{\"indexed\":true,\"name\":\"_feeRecipient\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_fills\",\"type\":\"bytes\"}],\"name\":\"RingMined\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"num\",\"type\":\"uint256\"}],\"name\":\"LogInfoNumber\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"bs\",\"type\":\"bytes32\"}],\"name\":\"LogInfoBytes32\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"addr\",\"type\":\"address\"}],\"name\":\"LogInfoAddress\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"log\",\"type\":\"string\"}],\"name\":\"LogInfoString\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"bs\",\"type\":\"bytes\"}],\"name\":\"LogInfoBytes\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"_ringHash\",\"type\":\"bytes32\"}],\"name\":\"InvalidRing\",\"type\":\"event\"}]"
   implicit val ringSubmitterAbi = new RingSubmitterABI(ringSubmitterAbiJsonStr)
 
   val methodId = Numeric.toHexString(ringSubmitterAbi.submitRing.encodeSignature())
   val one: BigInt = BigInt("1000000000000000000")
   val chainId = BigInt(151).byteValue()
 
-  val protocol = "0xd5eb799b31db2f667298f07a078f528a3e8390c5"
+  val protocol = "0x2e7e3c9c8c0c80549ce6a402b79beaac170c1e9a"
 
   val lrcAddress = "0xcd36128815ebe0b44d0374649bad2721b8751bef"
   val wethAddress = "0xf079E0612E869197c5F4c7D0a95DF570B163232b"
@@ -40,10 +40,13 @@ class SubmitRingSpec extends FlatSpec with Matchers {
   val account1PrivateKey = "5b791c6c9f4b7aa95ccb58f0f939397d1dcd047a5c0231e77ca353ebfea306f3"
   val account2 = "0xb1018949b241d76a1ab2094f473e9befeabb5ead"
   val account2PrivateKey = "ba7c9144fe2351c208287f9204b7c5940b0732ac577b771587ea872c4f46da9e"
-
   val miner = "0x4bad3053d574cd54513babe21db3f09bea1d387d"
   val privateKey = "8e0f7f4f5a49ada14726b90412722055da6899a0a673e8350803429da97bc7d3"
-  val nonce = BigInt(4813)
+
+  val nonce = BigInt(4912)
+  val validSince = 1541779200
+
+  // todo: ring generator broker为"0x0"时 合约debug为owner 合约bug？？？？？
 
   val ringSigner: RingSigner = new RingSignerImpl(protocol, chainId, privateKey, miner, lrcAddress)
 
@@ -59,7 +62,7 @@ class SubmitRingSpec extends FlatSpec with Matchers {
       feeAmount = one * 10,
       dualAuthAddress = account1,
       allOrNone = false,
-      validSince = 1541779200,
+      validSince = validSince,
       wallet = miner,
       tokenReceipt = miner,
       feeToken = lrcAddress,
@@ -77,7 +80,7 @@ class SubmitRingSpec extends FlatSpec with Matchers {
       feeAmount = one * 10,
       dualAuthAddress = account2,
       allOrNone = false,
-      validSince = 1541779200,
+      validSince = validSince,
       wallet = miner,
       tokenReceipt = miner,
       feeToken = lrcAddress,
@@ -116,6 +119,7 @@ class SubmitRingSpec extends FlatSpec with Matchers {
 
   private def fullOrder(raworder: Order, privatekey: String): Order = {
     val orderhash = raworder.generateHash
+    info(orderhash)
     val sig = getSignature(orderhash, privatekey)
     raworder.copy(hash = orderhash, sig = sig, dualAuthSig = sig)
   }
