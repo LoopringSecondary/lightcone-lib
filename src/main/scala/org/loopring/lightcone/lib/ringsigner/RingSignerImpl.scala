@@ -26,8 +26,7 @@ class RingSignerImpl(
     privateKey: String = "0x",
     feeReceipt: String = "",
     lrcAddress: String = "0xef68e7c694f40c8202821edf525de3782458639f",
-    methodId: String = "0x"
-) extends RingSigner {
+)(implicit abi: RingSubmitterABI) extends RingSigner {
   val credentials: Credentials = Credentials.create(privateKey)
 
   implicit val ringSerializer = new RingSerializerImpl(lrcAddress)
@@ -46,8 +45,12 @@ class RingSignerImpl(
       miner = credentials.getAddress,
       sig = Numeric.toHexString(sigBytes)
     )
-    val data = lRing.getInputData()
-    methodId + Numeric.cleanHexPrefix(data)
+    //val data = lRing.getInputData()
+    val data = ringSerializer.serialize(lRing)
+    val bytes = Numeric.hexStringToByteArray(Numeric.cleanHexPrefix(data))
+    val encode = abi.submitRing.encode(bytes)
+    val ret = Numeric.toHexString(encode)
+    ret
   }
 
   // todo: gaslimit, gasprice...

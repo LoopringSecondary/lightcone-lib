@@ -33,7 +33,7 @@ case class ByteStream() {
   }
 
   def getBytes: Array[Byte] = {
-    return Numeric.hexStringToByteArray(data)
+    Numeric.hexStringToByteArray(data)
   }
 
   /////////////////////////

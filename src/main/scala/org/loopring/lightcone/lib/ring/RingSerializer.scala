@@ -22,7 +22,6 @@ trait RingSerializer {
 
   // 根据环路信息组装合约data
   def serialize(ring: Ring): String
-
 }
 
 class RingSerializerImpl(lrcAddress: String) extends RingSerializer {
@@ -31,7 +30,7 @@ class RingSerializerImpl(lrcAddress: String) extends RingSerializer {
     ring.orders.foreach(o ⇒ assert(o.hash.nonEmpty))
 
     val helper = new RingSerializerHelper(lrcAddress, ring)
-    helper.assemble()
+    helper.assemble().getData
   }
 
 }
@@ -46,7 +45,7 @@ private[lib] class RingSerializerHelper(lrcAddress: String, ring: Ring) {
   val orderSpendableSMap = MMap.empty[String, Int]
   val orderSpendableFeeMap = MMap.empty[String, Int]
 
-  def assemble(): String = {
+  def assemble(): ByteStream = {
     val numSpendables = setupSpendables
 
     datastream.addUint(0)
@@ -69,7 +68,7 @@ private[lib] class RingSerializerHelper(lrcAddress: String, ring: Ring) {
     stream.addUint(0)
     stream.addHex(datastream.getData)
 
-    stream.getData
+    stream
   }
 
   def setupSpendables: Int = {

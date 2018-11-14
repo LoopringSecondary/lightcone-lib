@@ -22,15 +22,17 @@ import org.web3j.utils.Numeric
 
 class SubmitRingSpec extends FlatSpec with Matchers {
 
-  val ringSubmitterAbiJsonStr = "[{\"constant\":false,\"inputs\":[{\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"submitRings\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"FEE_PERCENTAGE_BASE\",\"outputs\":[{\"name\":\"\",\"type\":\"uint16\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"_ringIndex\",\"type\":\"uint256\"},{\"indexed\":true,\"name\":\"_ringHash\",\"type\":\"bytes32\"},{\"indexed\":true,\"name\":\"_feeRecipient\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_fills\",\"type\":\"bytes\"}],\"name\":\"RingMined\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"_ringHash\",\"type\":\"bytes32\"}],\"name\":\"InvalidRing\",\"type\":\"event\"}]"
-  val ringSubmitterAbi = new RingSubmitterABI(ringSubmitterAbiJsonStr)
+  val debug = true
+
+  val ringSubmitterAbiJsonStr = "[{\"constant\":false,\"inputs\":[{\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"submitRings\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"FEE_PERCENTAGE_BASE\",\"outputs\":[{\"name\":\"\",\"type\":\"uint16\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"_ringIndex\",\"type\":\"uint256\"},{\"indexed\":true,\"name\":\"_ringHash\",\"type\":\"bytes32\"},{\"indexed\":true,\"name\":\"_feeRecipient\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_fills\",\"type\":\"bytes\"}],\"name\":\"RingMined\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"log\",\"type\":\"string\"}],\"name\":\"LogInfo\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"_ringHash\",\"type\":\"bytes32\"}],\"name\":\"InvalidRing\",\"type\":\"event\"}]"
+  implicit val ringSubmitterAbi = new RingSubmitterABI(ringSubmitterAbiJsonStr)
+
   val methodId = Numeric.toHexString(ringSubmitterAbi.submitRing.encodeSignature())
-
-  val one = BigInt("1000000000000000000")
-
+  val one: BigInt = BigInt("1000000000000000000")
   val chainId = BigInt(151).byteValue()
 
-  val protocol = "0x294a2b21ab051ec62589596372c6fcb7e8f16795"
+  val protocol = "0xd5eb799b31db2f667298f07a078f528a3e8390c5"
+
   val lrcAddress = "0xcd36128815ebe0b44d0374649bad2721b8751bef"
   val wethAddress = "0xf079E0612E869197c5F4c7D0a95DF570B163232b"
 
@@ -41,9 +43,9 @@ class SubmitRingSpec extends FlatSpec with Matchers {
 
   val miner = "0x4bad3053d574cd54513babe21db3f09bea1d387d"
   val privateKey = "8e0f7f4f5a49ada14726b90412722055da6899a0a673e8350803429da97bc7d3"
-  val nonce = BigInt(4619)
+  val nonce = BigInt(4813)
 
-  val ringSigner: RingSigner = new RingSignerImpl(protocol, chainId, privateKey, miner, lrcAddress, methodId)
+  val ringSigner: RingSigner = new RingSignerImpl(protocol, chainId, privateKey, miner, lrcAddress)
 
   "simpleTest1" should "serialize and deserialize" in {
     info("[sbt lib/'testOnly *SubmitRingSpec -- -z simpleTest1']")
@@ -73,7 +75,7 @@ class SubmitRingSpec extends FlatSpec with Matchers {
       amountB = one * 100,
       owner = account2,
       feeAmount = one * 10,
-      dualAuthAddress = "0xa876ab5c19ff8c8065b1114cf7dfe9d09686afbf",
+      dualAuthAddress = account2,
       allOrNone = false,
       validSince = 1541779200,
       wallet = miner,
@@ -96,6 +98,10 @@ class SubmitRingSpec extends FlatSpec with Matchers {
     val tx = ringSigner.generateTxData(input, nonce)
     info(Numeric.toHexString(tx))
   }
+
+  //  "dualAuthSpec" should "generate correct auth sig with address" in {
+  //
+  //  }
 
   private def getSignature(hash: String, privKey: String): String = {
     import org.web3j.crypto.Credentials
