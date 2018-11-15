@@ -29,7 +29,6 @@ case class Order(
     allOrNone: Boolean,
     feeToken: String,
     feeAmount: BigInt,
-    tokenReceipt: String,
     sig: String,
     dualAuthSig: String,
     // option
@@ -39,6 +38,7 @@ case class Order(
     dualAuthAddress: String = "0x0",
     broker: String = "0x0",
     orderInterceptor: String = "0x0",
+    tokenReceipt: String = "0x0",
     version: Int = 0,
     walletSplitPercentage: Int = 0,
     tokenSFeePercentage: Int = 0,
