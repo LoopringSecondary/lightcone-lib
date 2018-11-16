@@ -49,7 +49,7 @@ case class Order(
     brokerSpendableS: BigInt = 0,
     brokerSpendableFee: BigInt = 0,
 ) {
-  
+
   def generateHash: String = {
     val EIP712_HEADER = "0x1901"
     val EIP712_ORDER_SCHEMA_HASH = "0x5632ff1bdfbe9ca7ecbcb1bd8c61f364e0debfed45fd8be4e459081586292fff"

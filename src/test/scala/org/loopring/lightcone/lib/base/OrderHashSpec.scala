@@ -18,12 +18,12 @@ package org.loopring.lightcone.lib
 
 import org.scalatest._
 
-class EIPTypeDataSpec extends FlatSpec with Matchers {
+class OrderHashSpec extends FlatSpec with Matchers {
 
   val one = BigInt("1000000000000000000")
 
   "generateOrderHash" should "generate Hash" in {
-    info("[sbt lib/'testOnly *EIPTypeDataSpec -- -z generateOrderHash']")
+    info("[sbt lib/'testOnly *OrderHashSpec -- -z generateOrderHash']")
 
     val originOrderhash = "0x2696da234c3ee71f8dbf09ad102dc3d7c6b5b94e25e40de84d6c26c15b1a5984"
 
