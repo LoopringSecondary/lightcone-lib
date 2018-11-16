@@ -49,42 +49,7 @@ case class Order(
     brokerSpendableS: BigInt = 0,
     brokerSpendableFee: BigInt = 0,
 ) {
-
-  /*
-  * // Precalculated EIP712_ORDER_SCHEMA_HASH amd EIP712_DOMAIN_HASH because
-        // the solidity compiler doesn't correctly precalculate them for us.
-        bytes32 _EIP712_ORDER_SCHEMA_HASH = 0x5632ff1bdfbe9ca7ecbcb1bd8c61f364e0debfed45fd8be4e459081586292fff;
-        bytes32 _EIP712_DOMAIN_HASH = 0xaea25658c273c666156bd427f83a666135fcde6887a6c25fc1cd1562bc4f3f34;
-
-        bytes32 hash;
-        assembly {
-            let ptr := mload(64)
-            mstore(add(ptr,   0), _EIP712_ORDER_SCHEMA_HASH)     // EIP712_ORDER_SCHEMA_HASH
-            mstore(add(ptr,  32), mload(add(order, 128)))        // order.amountS
-            mstore(add(ptr,  64), mload(add(order, 160)))        // order.amountB
-            mstore(add(ptr,  96), mload(add(order, 640)))        // order.feeAmount
-            mstore(add(ptr, 128), mload(add(order, 192)))        // order.validSince
-            mstore(add(ptr, 160), mload(add(order, 480)))        // order.validUntil
-            mstore(add(ptr, 192), mload(add(order,  32)))        // order.owner
-            mstore(add(ptr, 224), mload(add(order,  64)))        // order.tokenS
-            mstore(add(ptr, 256), mload(add(order,  96)))        // order.tokenB
-            mstore(add(ptr, 288), mload(add(order, 288)))        // order.dualAuthAddr
-            mstore(add(ptr, 320), mload(add(order, 320)))        // order.broker
-            mstore(add(ptr, 352), mload(add(order, 416)))        // order.orderInterceptor
-            mstore(add(ptr, 384), mload(add(order, 448)))        // order.wallet
-            mstore(add(ptr, 416), mload(add(order, 768)))        // order.tokenRecipient
-            mstore(add(ptr, 448), mload(add(order, 608)))        // order.feeToken
-            mstore(add(ptr, 480), mload(add(order, 800)))        // order.walletSplitPercentage
-            mstore(add(ptr, 512), mload(add(order, 704)))        // order.tokenSFeePercentage
-            mstore(add(ptr, 544), mload(add(order, 736)))        // order.tokenBFeePercentage
-            mstore(add(ptr, 576), mload(add(order, 576)))        // order.allOrNone
-            let message := keccak256(ptr, 608)                   // 19 * 32
-
-            mstore(add(ptr,  0), 0x1901)                         // EIP191_HEADER
-            mstore(add(ptr, 32), _EIP712_DOMAIN_HASH)            // EIP712_DOMAIN_HASH
-            mstore(add(ptr, 64), message)                        // message
-            hash := keccak256(add(ptr, 30), 66)                  // 2 + 32 + 32
-  * */
+  
   def generateHash: String = {
     val EIP712_HEADER = "0x1901"
     val EIP712_ORDER_SCHEMA_HASH = "0x5632ff1bdfbe9ca7ecbcb1bd8c61f364e0debfed45fd8be4e459081586292fff"
