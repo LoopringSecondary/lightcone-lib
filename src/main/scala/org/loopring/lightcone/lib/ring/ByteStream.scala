@@ -20,8 +20,6 @@ import org.web3j.utils.Numeric
 
 case class ByteStream() {
 
-  val addressLength = 20
-
   var data: String = ""
 
   def getData: String = {
@@ -32,32 +30,34 @@ case class ByteStream() {
     }
   }
 
-  def getBytes: Array[Byte] = {
-    Numeric.hexStringToByteArray(data)
-  }
+  def getBytes: Array[Byte] = Numeric.hexStringToByteArray(data)
 
   /////////////////////////
   // functions for pack
   //
   /////////////////////////
-  def addAddress(x: String, forceAppend: Boolean = false): Int =
-    insert(Numeric.toHexStringNoPrefixZeroPadded(Numeric.toBigInt(x), addressLength * 2), forceAppend)
+  def addAddress(x: String, numBytes: Int = 20, forceAppend: Boolean = false): Int =
+    insert(Numeric.toHexStringNoPrefixZeroPadded(Numeric.toBigInt(x), numBytes * 2), forceAppend)
 
-  def addUint8(num: BigInt, forceAppend: Boolean = true): Int = addBigInt(num, 1, forceAppend)
+  def addUint8(num: BigInt, numBytes: Int = 1, forceAppend: Boolean = true): Int = addBigInt(num, numBytes, forceAppend)
 
-  def addUint16(num: BigInt, forceAppend: Boolean = true): Int = addBigInt(num, 2, forceAppend)
+  def addUint16(num: BigInt, numBytes: Int = 2, forceAppend: Boolean = true): Int = addBigInt(num, numBytes, forceAppend)
 
-  def addUint32(num: BigInt, forceAppend: Boolean = true): Int = addBigInt(num, 4, forceAppend)
+  def addUint32(num: BigInt, numBytes: Int = 4, forceAppend: Boolean = true): Int = addBigInt(num, numBytes, forceAppend)
 
-  def addUint(num: BigInt, forceAppend: Boolean = true): Int = addBigInt(num, 32, forceAppend)
+  def addUint(num: BigInt, numBytes: Int = 32, forceAppend: Boolean = true): Int = addBigInt(num, numBytes, forceAppend)
 
   def addX(num: BigInt, numBytes: Int, forceAppend: Boolean = true): Int = addBigInt(num, numBytes, forceAppend)
 
-  def addBoolean(b: Boolean, forceAppend: Boolean = true): Int =
-    addBigInt(if (b) 1 else 0, 1, forceAppend)
+  def addBoolean(b: Boolean, numBytes: Int = 1, forceAppend: Boolean = true): Int =
+    addBigInt(if (b) 1 else 0, numBytes, forceAppend)
 
   def addHex(str: String, forceAppend: Boolean = true): Int =
     insert(Numeric.cleanHexPrefix(str), forceAppend)
+
+  def addPadHex(str: String, numBytes: Int = 32, forceAppend: Boolean = true): Int = {
+    insert(Numeric.toHexStringNoPrefixZeroPadded(hexString2BigInt(str).bigInteger, numBytes * 2), forceAppend)
+  }
 
   def addRawBytes(str: String, forceAppend: Boolean = true): Int =
     insert(Numeric.cleanHexPrefix(str), forceAppend)
