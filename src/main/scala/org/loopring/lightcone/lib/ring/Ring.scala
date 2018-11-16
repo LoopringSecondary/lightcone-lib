@@ -28,10 +28,10 @@ case class Ring(
     transactionOrigin: String
 ) {
 
-  def hash: String = {
+  def generateHash: String = {
     val stream = ByteStream()
     orders.foreach { order ⇒
-      stream.addHex(order.hash)
+      stream.addPadHex(order.hash)
       stream.addUint16(order.waiveFeePercentage)
     }
     Numeric.toHexString(web3Hash.sha3(stream.getBytes))

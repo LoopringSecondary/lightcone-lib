@@ -35,7 +35,7 @@ class RingSignerImpl(
 
   def generateInputData(ring: Ring): String = {
     val signatureData = Sign.signMessage(
-      Numeric.hexStringToByteArray(ring.hash),
+      Numeric.hexStringToByteArray(ring.generateHash),
       credentials.getEcKeyPair
     )
     val sigBytes = signatureData.getR ++ signatureData.getS
