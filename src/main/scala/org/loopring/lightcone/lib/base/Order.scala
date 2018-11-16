@@ -55,6 +55,7 @@ case class Order(
     val EIP712_ORDER_SCHEMA_HASH = "0x5632ff1bdfbe9ca7ecbcb1bd8c61f364e0debfed45fd8be4e459081586292fff"
     val EIP712_DOMAIN_HASH = "0xaea25658c273c666156bd427f83a666135fcde6887a6c25fc1cd1562bc4f3f34"
 
+    // encode 19 * 32 bytes
     val data = ByteStream()
     data.addPadHex(EIP712_ORDER_SCHEMA_HASH)
     data.addUint(amountS)
@@ -78,6 +79,13 @@ case class Order(
 
     val message = Numeric.toHexString(web3Hash.sha3(data.getBytes))
 
+    // encodePacked 需要根据不同类型确定数据长度
+    // ex:
+    // abi.encodePacked(uint8(0x42), uint256(0x1337), "AAAA", "BBBB")
+    // 0x42
+    // 0x0000000000000000000000000000000000000000000000000000000000001337
+    // 0x41414141
+    // 0x42424242
     val eip = ByteStream()
     eip.addHex(EIP712_HEADER)
     eip.addHex(EIP712_DOMAIN_HASH)

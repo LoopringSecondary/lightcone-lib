@@ -16,30 +16,14 @@
 
 package org.loopring.lightcone
 
-import java.math.BigInteger
-
 import org.web3j.utils.Numeric
-
-import scala.collection.mutable.{ HashMap ⇒ MMap }
 
 // todo lib里面是否需要定义amount,address,hash等数据结构,与core项目的amount等该如何调用
 
 package object lib {
 
-  case class EIP712TypeUnit(typ: String, name: String)
-
-  type EIP712Type = Seq[EIP712TypeUnit]
-  type EIP712Types = MMap[String, EIP712Type]
-  type EIP712Data = MMap[String, Any]
-
   implicit def bytes2BigInt(bytes: Array[Byte]): BigInt = Numeric.toBigInt(bytes)
   implicit def hexString2BigInt(hex: String): BigInt = Numeric.toBigInt(hex)
-
-  //  implicit def int2BigInteger(n: Int): BigInteger = BigInt(n).bigInteger
-  //  implicit def log2BigInteger(l: Long): BigInteger = BigInt(l).bigInteger
-  //  implicit def hex2BigInteger(hex: String): BigInteger = hexString2BigInt(hex).bigInteger
-  //  implicit def bool2BigInteger(b: Boolean): BigInteger = BigInt(if (b) 1 else 0).bigInteger
-  //  implicit def bytes2BigInteger(bytes: Array[Byte]): BigInteger = bytes2BigInt(bytes).bigInteger
 
   implicit class RichString(src: String) {
 
