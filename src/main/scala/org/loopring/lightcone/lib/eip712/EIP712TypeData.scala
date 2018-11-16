@@ -36,57 +36,60 @@ case class EIP712TypeData(
   }
 
   def hashStruct(primaryType: String, data: EIP712Data): Array[Byte] = {
-    Hash.sha3(encodeData(primaryType, data))
+    val temp = encodeData(primaryType, data)
+    val temphex = Numeric.toHexString(temp)
+    Hash.sha3(temp)
   }
 
   def encodeData(primaryType: String, data: EIP712Data): Array[Byte] = {
-    var encodedTypes = Array[String]("bytes32")
-    var encodedValues = hashType(primaryType)
+    var encTypes = Array[String]("bytes32")
+    var encValues = hashType(primaryType)
 
     this.types(primaryType).foreach { field ⇒
-      val encType = field.typ
-      val encValue = data(field.name)
+      val _encType = field.typ
+      val _encValue = data(field.name)
 
       if (this.types.contains(field.typ)) {
-        encodedTypes :+= "bytes32"
-        val value = encValue match {
+        encTypes :+= "bytes32"
+        val value = _encValue match {
           case d: EIP712Data ⇒ Hash.sha3(encodeData(field.typ, d))
           case _             ⇒ Array.emptyByteArray
         }
-        encodedValues ++= value
+        encValues ++= value
       } else {
-        val (primiviteEncType, primiviteEncValue) = primivite(encType, encValue)
-        encodedTypes :+= primiviteEncType
-        encodedValues ++= primiviteEncValue
+        val (primiviteEncType, primiviteEncValue) = primivite(_encType, _encValue)
+        encTypes :+= primiviteEncType
+        encValues ++= primiviteEncValue
       }
     }
 
-    encodedValues
+    encValues
   }
 
-  // 订单中包含字段address, bool, uint, uint16, int16
   private[lib] def primivite(encType: String, encValue: Any): (String, Array[Byte]) = {
     val ENCODE_LENGTH = 32
 
     encType match {
       case "address" ⇒ encValue match {
-        case v: String ⇒ ("address", Numeric.toBytesPadded(v, ENCODE_LENGTH))
+        case v: String ⇒ ("address", Numeric.toBytesPadded(hexString2BigInt(v).bigInteger, ENCODE_LENGTH))
         case _         ⇒ throw new Exception("invalid address:encValue not match")
       }
 
       case "bool" ⇒ encValue match {
-        case v: Boolean ⇒ ("uint256", Numeric.toBytesPadded(v, ENCODE_LENGTH))
+        case v: Boolean ⇒ ("uint256", Numeric.toBytesPadded(BigInt(if (v) 1 else 0).bigInteger, ENCODE_LENGTH))
         case _          ⇒ throw new Exception("invalid bool:encValue not match")
       }
 
       case "uint16" | "int16" | "uint" ⇒ encValue match {
         case v: BigInt ⇒ ("uint256", Numeric.toBytesPadded(v.bigInteger, ENCODE_LENGTH))
-        case _         ⇒ throw new Exception("invalid uint:encValue not match")
+        case v: Int    ⇒ ("uint256", Numeric.toBytesPadded(BigInt(v).bigInteger, ENCODE_LENGTH))
+        case _         ⇒ throw new Exception("invalid uint/int16/uint16:encValue not match")
       }
-      //      case "bytes" | "string" ⇒ encValue match {
-      //        case v: Array[Byte] ⇒ ("bytes32", Numeric.toBytesPadded(Hash.sha3(v), ENCODE_LENGTH))
-      //        case v: String ⇒ ("bytes32", Numeric.toBytesPadded(Hash.sha3(v.getBytes()), ENCODE_LENGTH))
-      //      }
+
+      case "string" ⇒ encValue match {
+        case v: String ⇒ ("bytes32", Numeric.cleanHexPrefix(Hash.sha3(v)).getBytes())
+        case _         ⇒ throw new Exception("invalid string:encValue not match")
+      }
 
       case _ ⇒ throw new Exception("order field type undefined")
     }
@@ -104,10 +107,11 @@ case class EIP712TypeData(
     deps = Array[String](primaryType) ++ deps
 
     deps.foreach { dep ⇒
-      if (this.types.contains(dep)) {
+      if (!this.types.contains(dep)) {
         throw new Exception(s"No type definition specified: $dep")
       }
-      result += s"$dep(${this.types(dep).map(o ⇒ s"${o.typ} ${o.name},")})"
+      val stringBuilder = new StringBuilder
+      result += s"$dep(${this.types(dep).map(o ⇒ s"${o.typ} ${o.name}").addString(stringBuilder, ",")})"
     }
 
     result.getBytes()

@@ -35,9 +35,11 @@ package object lib {
   implicit def bytes2BigInt(bytes: Array[Byte]): BigInt = Numeric.toBigInt(bytes)
   implicit def hexString2BigInt(hex: String): BigInt = Numeric.toBigInt(hex)
 
-  implicit def hex2BigInteger(hex: String): BigInteger = hexString2BigInt(hex).bigInteger
-  implicit def bool2BigInteger(b: Boolean): BigInteger = BigInt(if (b) 1 else 0).bigInteger
-  implicit def bytes2BigInteger(bytes: Array[Byte]): BigInteger = bytes2BigInt(bytes).bigInteger
+  //  implicit def int2BigInteger(n: Int): BigInteger = BigInt(n).bigInteger
+  //  implicit def log2BigInteger(l: Long): BigInteger = BigInt(l).bigInteger
+  //  implicit def hex2BigInteger(hex: String): BigInteger = hexString2BigInt(hex).bigInteger
+  //  implicit def bool2BigInteger(b: Boolean): BigInteger = BigInt(if (b) 1 else 0).bigInteger
+  //  implicit def bytes2BigInteger(bytes: Array[Byte]): BigInteger = bytes2BigInt(bytes).bigInteger
 
   implicit class RichString(src: String) {
 
