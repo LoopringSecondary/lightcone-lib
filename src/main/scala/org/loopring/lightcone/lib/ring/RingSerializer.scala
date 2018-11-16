@@ -139,16 +139,16 @@ private[lib] class RingSerializerHelper(lrcAddress: String, ring: Ring) {
     insertOffset(datastream.addAddress(order.owner))
     insertOffset(datastream.addAddress(order.tokenS))
     insertOffset(datastream.addAddress(order.tokenB))
-    insertOffset(datastream.addUint(order.amountS, false))
-    insertOffset(datastream.addUint(order.amountB, false))
-    insertOffset(datastream.addUint32(order.validSince, false))
+    insertOffset(datastream.addUint(order.amountS, 32, false))
+    insertOffset(datastream.addUint(order.amountB, 32, false))
+    insertOffset(datastream.addUint32(order.validSince, 32, false))
 
     orderSpendableSMap.get(order.hash) match {
-      case Some(x: Int) ⇒ tablestream.addUint16(x.intValue())
+      case Some(x: Int) ⇒ tablestream.addUint16(x)
       case _            ⇒ throw new Exception("ringGenerator get " + order.hash + "orderSpendableS failed")
     }
     orderSpendableFeeMap.get(order.hash) match {
-      case Some(x: Int) ⇒ tablestream.addUint16(x.intValue())
+      case Some(x: Int) ⇒ tablestream.addUint16(x)
       case _            ⇒ throw new Exception("ringGenerator get " + order.hash + "orderSpendableFee failed")
     }
 
@@ -171,7 +171,7 @@ private[lib] class RingSerializerHelper(lrcAddress: String, ring: Ring) {
     }
 
     if (order.validUntil > 0) {
-      insertOffset(datastream.addUint32(order.validUntil, false))
+      insertOffset(datastream.addUint32(order.validUntil, 4, false))
     } else {
       insertDefault()
     }
@@ -200,7 +200,7 @@ private[lib] class RingSerializerHelper(lrcAddress: String, ring: Ring) {
     }
 
     if (order.feeAmount.signum > 0) {
-      insertOffset(datastream.addUint(order.feeAmount, false))
+      insertOffset(datastream.addUint(order.feeAmount, 32, false))
     } else {
       insertDefault()
     }
