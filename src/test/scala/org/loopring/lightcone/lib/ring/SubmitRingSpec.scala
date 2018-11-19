@@ -31,7 +31,7 @@ class SubmitRingSpec extends FlatSpec with Matchers {
   val one: BigInt = BigInt("1000000000000000000")
   val chainId = BigInt(151).byteValue()
 
-  val protocol = "0x3c18c3c4470af29e6867382c7fdefdcf571bede0"
+  val protocol = "0x20eb7225eaddf4d729c9c938663d6afef654f6d7"
 
   val lrcAddress = "0xcd36128815ebe0b44d0374649bad2721b8751bef"
   val wethAddress = "0xf079E0612E869197c5F4c7D0a95DF570B163232b"
@@ -43,9 +43,9 @@ class SubmitRingSpec extends FlatSpec with Matchers {
   val miner = "0x4bad3053d574cd54513babe21db3f09bea1d387d"
   val privateKey = "8e0f7f4f5a49ada14726b90412722055da6899a0a673e8350803429da97bc7d3"
 
-  val nonce = BigInt(5000)
+  val nonce = BigInt(5236)
   val validSince = 1541779200
-
+  val validUntil = 1542621731
   // todo: ring generator broker为"0x0"时 合约debug为owner 合约bug？？？？？
 
   val ringSigner: RingSigner = new RingSignerImpl(protocol, chainId, privateKey, miner, lrcAddress)
@@ -63,6 +63,7 @@ class SubmitRingSpec extends FlatSpec with Matchers {
       dualAuthAddress = account1,
       allOrNone = false,
       validSince = validSince,
+      validUntil = validUntil,
       wallet = miner,
       tokenReceipt = miner,
       feeToken = lrcAddress,
@@ -81,6 +82,7 @@ class SubmitRingSpec extends FlatSpec with Matchers {
       dualAuthAddress = account2,
       allOrNone = false,
       validSince = validSince,
+      validUntil = validUntil,
       wallet = miner,
       tokenReceipt = miner,
       feeToken = lrcAddress,
