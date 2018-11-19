@@ -117,8 +117,6 @@ class RingDataSpec extends FlatSpec with Matchers {
     ringhash should be(originRingHash)
 
     val serializeRes = generator.serialize(ring)
-    info("origin ring data:" + originRingData)
-    info("generated ring data: " + serializeRes)
     serializeRes should be(originRingData)
 
     val deserializeRes = deserializer.deserialize(originRingData)
