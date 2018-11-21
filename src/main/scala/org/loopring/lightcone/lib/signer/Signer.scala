@@ -20,29 +20,33 @@ import org.web3j.crypto.Sign
 import org.web3j.crypto.Credentials
 import org.web3j.utils.Numeric
 
+object SignAlgorithm extends Enumeration {
+  type AlgorithmType = Value
+  val ALGORITHM_ETHEREUM = Value(0)
+  val ALGORITHM_EIP712 = Value(1)
+}
+
 class Signer(privateKey: String) {
 
-  val ALGORITHM_ETHEREUM = 0
-  val ALGORITHM_EIP712 = 1
-
   val credentials = Credentials.create(privateKey)
+  val keyPair = credentials.getEcKeyPair
+  val address = credentials.getAddress
 
-  def getAddress: String = credentials.getAddress
+  def sign(algorithm: SignAlgorithm.Value, hash: String): String = {
+    val data = Numeric.hexStringToByteArray(hash)
 
-  def sign(algorithm: Int, hash: String): String = {
-    require(Seq(ALGORITHM_EIP712, ALGORITHM_ETHEREUM).contains(algorithm))
-
-    val signatureData = Sign.signMessage(
-      Numeric.hexStringToByteArray(hash),
-      credentials.getEcKeyPair
-    )
+    val signatureData = algorithm match {
+      case SignAlgorithm.ALGORITHM_ETHEREUM ⇒ Sign.signPrefixedMessage(data, keyPair)
+      case SignAlgorithm.ALGORITHM_EIP712 ⇒ Sign.signMessage(data, keyPair, false)
+      case _ ⇒ throw new Exception("algorithm invalid")
+    }
 
     val v = signatureData.getV
     val r = Numeric.toHexString(signatureData.getR)
     val s = Numeric.toHexString(signatureData.getS)
 
     val sig = ByteStream()
-    sig.addUint8(algorithm)
+    sig.addUint8(algorithm.id)
     sig.addUint8(1 + 32 + 32)
     sig.addUint8(v)
     sig.addPadHex(r)
