@@ -24,6 +24,7 @@ package object lib {
 
   implicit def bytes2BigInt(bytes: Array[Byte]): BigInt = Numeric.toBigInt(bytes)
   implicit def hexString2BigInt(hex: String): BigInt = Numeric.toBigInt(hex)
+  implicit def byte2BigInt(byte: Byte): BigInt = bytes2BigInt(Array[Byte](byte))
 
   implicit class RichString(src: String) {
 
