@@ -33,7 +33,7 @@ class SignerSpec extends FlatSpec with Matchers {
     val signer = new Signer(privateKey)
     signer.address should be(publicKey)
 
-    val sig = signer.sign(SignAlgorithm.ALGORITHM_ETHEREUM, hash)
+    val sig = signer.signHash(SignAlgorithm.ALGORITHM_ETHEREUM, hash)
     sig should be(encode)
   }
 
@@ -48,7 +48,7 @@ class SignerSpec extends FlatSpec with Matchers {
     val signer = new Signer(privateKey)
     signer.address should be(publicKey)
 
-    val sig = signer.sign(SignAlgorithm.ALGORITHM_EIP712, hash)
+    val sig = signer.signHash(SignAlgorithm.ALGORITHM_EIP712, hash)
     sig should be(encode)
   }
 

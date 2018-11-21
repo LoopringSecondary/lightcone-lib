@@ -37,8 +37,21 @@ case class Ring(
     Numeric.toHexString(web3Hash.sha3(stream.getBytes))
   }
 
-  def getInputData()(implicit serializer: RingSerializer): String = {
-    serializer.serialize(this)
+  def getInputData()(implicit serializer: RingSerializer, abi: RingSubmitterABI, signer: Signer): String = {
+    val ringHash = this.generateHash
+
+    val signatureData = signer.signHash(SignAlgorithm.ALGORITHM_ETHEREUM, ringHash)
+
+    val lRing = this.copy(
+      feeReceipt = feeReceipt,
+      miner = signer.address,
+      sig = signatureData
+    )
+
+    val data = serializer.serialize(lRing)
+    val bytes = Numeric.hexStringToByteArray(data)
+    val encode = abi.submitRing.encode(bytes)
+    Numeric.toHexString(encode)
   }
 
 }

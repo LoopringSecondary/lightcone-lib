@@ -16,8 +16,7 @@
 
 package org.loopring.lightcone.lib
 
-import org.web3j.crypto.Sign
-import org.web3j.crypto.Credentials
+import org.web3j.crypto.{ Credentials, RawTransaction, Sign, TransactionEncoder }
 import org.web3j.utils.Numeric
 
 object SignAlgorithm extends Enumeration {
@@ -26,13 +25,13 @@ object SignAlgorithm extends Enumeration {
   val ALGORITHM_EIP712 = Value(1)
 }
 
-class Signer(privateKey: String) {
+class Signer(privateKey: String, chainId: Byte = 1.toByte) {
 
   val credentials = Credentials.create(privateKey)
   val keyPair = credentials.getEcKeyPair
   val address = credentials.getAddress
 
-  def sign(algorithm: SignAlgorithm.Value, hash: String): String = {
+  def signHash(algorithm: SignAlgorithm.Value, hash: String): String = {
     val data = Numeric.hexStringToByteArray(hash)
 
     val signatureData = algorithm match {
@@ -53,5 +52,9 @@ class Signer(privateKey: String) {
     sig.addPadHex(s)
 
     sig.getData
+  }
+
+  def signTx(rawTransaction: RawTransaction): Array[Byte] = {
+    TransactionEncoder.signMessage(rawTransaction, chainId, credentials)
   }
 }
