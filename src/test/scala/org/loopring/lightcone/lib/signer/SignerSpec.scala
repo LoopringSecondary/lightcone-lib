@@ -17,6 +17,7 @@
 package org.loopring.lightcone.lib
 
 import org.scalatest._
+import org.web3j.utils.Numeric
 
 class SignerSpec extends FlatSpec with Matchers {
 
@@ -51,5 +52,4 @@ class SignerSpec extends FlatSpec with Matchers {
     val sig = signer.signHash(SignAlgorithm.ALGORITHM_EIP712, hash)
     sig should be(encode)
   }
-
 }
