@@ -17,17 +17,17 @@
 package org.loopring.lightcone.lib
 
 import org.scalatest._
-import org.web3j.crypto.{ RawTransaction, Sign }
+import org.web3j.crypto.RawTransaction
 import org.web3j.utils.Numeric
 
 class SubmitRingSpec extends FlatSpec with Matchers {
 
   val debug = true
 
-  val chainId = BigInt(151).byteValue()
+  val chainId = BigInt(151)
   val miner = "0x4bad3053d574cd54513babe21db3f09bea1d387d"
   val privateKey = "8e0f7f4f5a49ada14726b90412722055da6899a0a673e8350803429da97bc7d3"
-  implicit val ringSigner: Signer = new Signer(privateKey, chainId)
+  implicit val ringSigner: Signer = new Signer(privateKey)
 
   val lrcAddress = "0xcd36128815ebe0b44d0374649bad2721b8751bef"
   val wethAddress = "0xf079E0612E869197c5F4c7D0a95DF570B163232b"
@@ -39,16 +39,16 @@ class SubmitRingSpec extends FlatSpec with Matchers {
   val methodId = Numeric.toHexString(ringSubmitterAbi.submitRing.encodeSignature())
   val one: BigInt = BigInt("1000000000000000000")
 
-  val protocol = "0x20eb7225eaddf4d729c9c938663d6afef654f6d7"
+  val protocol = "0xa7341341d6d3e828550dbd298428b5d68993cd49"
 
   val account1 = "0x1b978a1d302335a6f2ebe4b8823b5e17c3c84135"
   val account1PrivateKey = "5b791c6c9f4b7aa95ccb58f0f939397d1dcd047a5c0231e77ca353ebfea306f3"
   val account2 = "0xb1018949b241d76a1ab2094f473e9befeabb5ead"
   val account2PrivateKey = "ba7c9144fe2351c208287f9204b7c5940b0732ac577b771587ea872c4f46da9e"
 
-  val nonce = BigInt(5236)
+  val nonce = BigInt(5253)
   val validSince = 1541779200
-  val validUntil = 1542621731
+  val validUntil = 1543955503
   // todo: ring generator broker为"0x0"时 合约debug为owner 合约bug？？？？？
 
   "simpleTest1" should "serialize and deserialize" in {
@@ -101,18 +101,18 @@ class SubmitRingSpec extends FlatSpec with Matchers {
       ringOrderIndex = Seq(Seq(0, 1))
     )
     val input = ring.getInputData()
-    val tx = generateTxData(input, nonce)
+    val tx = generateTxData(input)
     info(Numeric.toHexString(tx))
   }
 
   private def fullOrder(raworder: Order, privKey: String): Order = {
     val hash = raworder.generateHash
-    val signer = new Signer(privKey, chainId)
+    val signer = new Signer(privKey)
     val sig = signer.signHash(SignAlgorithm.ALGORITHM_ETHEREUM, hash)
     raworder.copy(hash = hash, sig = sig, dualAuthSig = sig)
   }
 
-  private def generateTxData(inputData: String, nonce: BigInt)(implicit signer: Signer): Array[Byte] = {
+  private def generateTxData(inputData: String)(implicit signer: Signer): Array[Byte] = {
     val rawTransaction = RawTransaction.createTransaction(
       nonce.bigInteger,
       BigInt("18000000000").bigInteger,
@@ -121,6 +121,6 @@ class SubmitRingSpec extends FlatSpec with Matchers {
       BigInt(0).bigInteger,
       inputData
     )
-    signer.signTx(rawTransaction)
+    signer.signTx(rawTransaction, chainId)
   }
 }
