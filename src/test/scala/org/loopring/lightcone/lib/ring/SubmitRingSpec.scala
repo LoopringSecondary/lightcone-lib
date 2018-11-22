@@ -33,27 +33,28 @@ class SubmitRingSpec extends FlatSpec with Matchers {
   val wethAddress = "0xf079E0612E869197c5F4c7D0a95DF570B163232b"
   implicit val serializer: RingSerializer = new RingSerializerImpl(lrcAddress)
 
-  val ringSubmitterAbiJsonStr = "[{\"constant\":false,\"inputs\":[{\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"submitRings\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"FEE_PERCENTAGE_BASE\",\"outputs\":[{\"name\":\"\",\"type\":\"uint16\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"_ringIndex\",\"type\":\"uint256\"},{\"indexed\":true,\"name\":\"_ringHash\",\"type\":\"bytes32\"},{\"indexed\":true,\"name\":\"_feeRecipient\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_fills\",\"type\":\"bytes\"}],\"name\":\"RingMined\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"_ringHash\",\"type\":\"bytes32\"}],\"name\":\"InvalidRing\",\"type\":\"event\"}]"
+  val ringSubmitterAbiJsonStr = "[{\"constant\":false,\"inputs\":[{\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"submitRings\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"FEE_PERCENTAGE_BASE\",\"outputs\":[{\"name\":\"\",\"type\":\"uint16\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"_ringIndex\",\"type\":\"uint256\"},{\"indexed\":true,\"name\":\"_ringHash\",\"type\":\"bytes32\"},{\"indexed\":true,\"name\":\"_feeRecipient\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_fills\",\"type\":\"bytes\"}],\"name\":\"RingMined\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"_ringHash\",\"type\":\"bytes32\"}],\"name\":\"InvalidRing\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"num\",\"type\":\"uint256\"}],\"name\":\"LogInfoNumber\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"bs\",\"type\":\"bytes32\"}],\"name\":\"LogInfoBytes32\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"addr\",\"type\":\"address\"}],\"name\":\"LogInfoAddress\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"log\",\"type\":\"string\"}],\"name\":\"LogInfoString\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"bs\",\"type\":\"bytes\"}],\"name\":\"LogInfoBytes\",\"type\":\"event\"}]"
   implicit val ringSubmitterAbi = new RingSubmitterABI(ringSubmitterAbiJsonStr)
 
   val methodId = Numeric.toHexString(ringSubmitterAbi.submitRing.encodeSignature())
   val one: BigInt = BigInt("1000000000000000000")
-
-  val protocol = "0xa7341341d6d3e828550dbd298428b5d68993cd49"
 
   val account1 = "0x1b978a1d302335a6f2ebe4b8823b5e17c3c84135"
   val account1PrivateKey = "5b791c6c9f4b7aa95ccb58f0f939397d1dcd047a5c0231e77ca353ebfea306f3"
   val account2 = "0xb1018949b241d76a1ab2094f473e9befeabb5ead"
   val account2PrivateKey = "ba7c9144fe2351c208287f9204b7c5940b0732ac577b771587ea872c4f46da9e"
 
-  val nonce = BigInt(5253)
   val validSince = 1541779200
   val validUntil = 1543955503
-  // todo: ring generator broker为"0x0"时 合约debug为owner 合约bug？？？？？
+
+  //////////////////// used for debug
+  val protocol = "0xd69abbd79faa34223b830b124323cb2f957b9229"
+  val nonce = BigInt(5496)
 
   "simpleTest1" should "serialize and deserialize" in {
     info("[sbt lib/'testOnly *SubmitRingSpec -- -z simpleTest1']")
 
+    // curl https://relay1.loopring.io/rpc/v2/ -X POST -H "Content-Type: application/json" --data '{"jsonrpc":"2.0","method":"loopring_getNonce","params":[{"owner":"0xdb88d20527332ad9bab730769891285dc62ba092"}],"id":64}'
     val raworder1 = Order(
       tokenS = lrcAddress,
       tokenB = wethAddress,
@@ -100,7 +101,7 @@ class SubmitRingSpec extends FlatSpec with Matchers {
       sig = "0x",
       ringOrderIndex = Seq(Seq(0, 1))
     )
-    val input = ring.getInputData()
+    val input = ring.getInputData(SignAlgorithm.ALGORITHM_ETHEREUM)
     val tx = generateTxData(input)
     info(Numeric.toHexString(tx))
   }
