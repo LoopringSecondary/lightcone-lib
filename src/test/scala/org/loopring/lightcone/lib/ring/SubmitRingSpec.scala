@@ -48,8 +48,8 @@ class SubmitRingSpec extends FlatSpec with Matchers {
   val validUntil = 1543955503
 
   //////////////////// used for debug
-  val protocol = "0xcebaab67d428ae02854458ea0e71bbaf2db61954"
-  val nonce = BigInt(5971)
+  val protocol = "0xbc39240947290033afe9eb2d07ec31cff683913e"
+  val nonce = BigInt(5987)
 
   "simpleTest1" should "serialize and deserialize" in {
     info("[sbt lib/'testOnly *SubmitRingSpec -- -z simpleTest1']")
