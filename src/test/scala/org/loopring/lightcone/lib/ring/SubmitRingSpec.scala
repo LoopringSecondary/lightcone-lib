@@ -48,8 +48,8 @@ class SubmitRingSpec extends FlatSpec with Matchers {
   val validUntil = 1543955503
 
   //////////////////// used for debug
-  val protocol = "0x908e71c470b45f47f06a4f1440454d04a04d2303"
-  val nonce = BigInt(5923)
+  val protocol = "0xcebaab67d428ae02854458ea0e71bbaf2db61954"
+  val nonce = BigInt(5971)
 
   "simpleTest1" should "serialize and deserialize" in {
     info("[sbt lib/'testOnly *SubmitRingSpec -- -z simpleTest1']")
@@ -108,25 +108,12 @@ class SubmitRingSpec extends FlatSpec with Matchers {
 
   private def fullOrder(raworder: Order, privKey: String): Order = {
     val hash = raworder.generateHash
-
-    val bytes = getEthereumMessageHash(Numeric.hexStringToByteArray(hash))
-    val signed = Numeric.toHexString(bytes)
-
     val signer = new Signer(privKey)
     val sig = signer.signHash(SignAlgorithm.ALGORITHM_EIP712, hash)
+    info("orderhash:" + hash)
+    info("sig:" + sig)
+    info("privateKey:" + privKey)
     raworder.copy(hash = hash, sig = sig, dualAuthSig = sig)
-  }
-
-  private val MESSAGE_PREFIX = "\u0019Ethereum Signed Message:\n"
-
-  private def getEthereumMessagePrefix(messageLength: Int) = MESSAGE_PREFIX.concat(String.valueOf(messageLength)).getBytes
-
-  private def getEthereumMessageHash(message: Array[Byte]) = {
-    val prefix = getEthereumMessagePrefix(message.length)
-    val result = new Array[Byte](prefix.length + message.length)
-    System.arraycopy(prefix, 0, result, 0, prefix.length)
-    System.arraycopy(message, 0, result, prefix.length, message.length)
-    Hash.sha3(result)
   }
 
   private def generateTxData(inputData: String)(implicit signer: Signer) = {
