@@ -40,16 +40,16 @@ class SubmitRingSpec extends FlatSpec with Matchers {
   val one: BigInt = BigInt("1000000000000000000")
 
   val account1 = "0x1b978a1d302335a6f2ebe4b8823b5e17c3c84135"
-  val account1PrivateKey = "5b791c6c9f4b7aa95ccb58f0f939397d1dcd047a5c0231e77ca353ebfea306f3"
+  val account1PrivateKey = "0x5b791c6c9f4b7aa95ccb58f0f939397d1dcd047a5c0231e77ca353ebfea306f3"
   val account2 = "0xb1018949b241d76a1ab2094f473e9befeabb5ead"
-  val account2PrivateKey = "ba7c9144fe2351c208287f9204b7c5940b0732ac577b771587ea872c4f46da9e"
+  val account2PrivateKey = "0xba7c9144fe2351c208287f9204b7c5940b0732ac577b771587ea872c4f46da9e"
 
   val validSince = 1541779200
   val validUntil = 1543955503
 
   //////////////////// used for debug
-  val protocol = "0x937222e3876e5f96856a6893e32b0f30d9cb8b31"
-  val nonce = BigInt(5704)
+  val protocol = "0x48ce5f903d3e3ac843a9634f832ced412ead2e45"
+  val nonce = BigInt(5832)
 
   "simpleTest1" should "serialize and deserialize" in {
     info("[sbt lib/'testOnly *SubmitRingSpec -- -z simpleTest1']")
@@ -108,12 +108,28 @@ class SubmitRingSpec extends FlatSpec with Matchers {
 
   private def fullOrder(raworder: Order, privKey: String): Order = {
     val hash = raworder.generateHash
+
+    val bytes = getEthereumMessageHash(Numeric.hexStringToByteArray(hash))
+    val signed = Numeric.toHexString(bytes)
+
     val signer = new Signer(privKey)
     val sig = signer.signHash(SignAlgorithm.ALGORITHM_ETHEREUM, hash)
     raworder.copy(hash = hash, sig = sig, dualAuthSig = sig)
   }
 
-  private def generateTxData(inputData: String)(implicit signer: Signer): Array[Byte] = {
+  private val MESSAGE_PREFIX = "\u0019Ethereum Signed Message:\n"
+
+  private def getEthereumMessagePrefix(messageLength: Int) = MESSAGE_PREFIX.concat(String.valueOf(messageLength)).getBytes
+
+  private def getEthereumMessageHash(message: Array[Byte]) = {
+    val prefix = getEthereumMessagePrefix(message.length)
+    val result = new Array[Byte](prefix.length + message.length)
+    System.arraycopy(prefix, 0, result, 0, prefix.length)
+    System.arraycopy(message, 0, result, prefix.length, message.length)
+    Hash.sha3(result)
+  }
+
+  private def generateTxData(inputData: String)(implicit signer: Signer) = {
     val rawTransaction = RawTransaction.createTransaction(
       nonce.bigInteger,
       BigInt("18000000000").bigInteger,
