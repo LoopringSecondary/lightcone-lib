@@ -101,7 +101,7 @@ class SubmitRingSpec extends FlatSpec with Matchers {
       sig = "0x",
       ringOrderIndex = Seq(Seq(0, 1))
     )
-    val input = ring.getInputData(SignAlgorithm.ALGORITHM_ETHEREUM)
+    val input = ring.getInputData(SignAlgorithm.ALGORITHM_EIP712)
     val tx = generateTxData(input)
     info(Numeric.toHexString(tx))
   }
@@ -113,7 +113,7 @@ class SubmitRingSpec extends FlatSpec with Matchers {
     val signed = Numeric.toHexString(bytes)
 
     val signer = new Signer(privKey)
-    val sig = signer.signHash(SignAlgorithm.ALGORITHM_ETHEREUM, hash)
+    val sig = signer.signHash(SignAlgorithm.ALGORITHM_EIP712, hash)
     raworder.copy(hash = hash, sig = sig, dualAuthSig = sig)
   }
 
