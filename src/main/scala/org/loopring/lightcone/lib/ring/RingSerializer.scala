@@ -22,7 +22,6 @@ trait RingSerializer {
 
   // 根据环路信息组装合约data
   def serialize(ring: Ring): String
-
 }
 
 class RingSerializerImpl(lrcAddress: String) extends RingSerializer {
@@ -31,7 +30,7 @@ class RingSerializerImpl(lrcAddress: String) extends RingSerializer {
     ring.orders.foreach(o ⇒ assert(o.hash.nonEmpty))
 
     val helper = new RingSerializerHelper(lrcAddress, ring)
-    helper.assemble()
+    helper.assemble().getData
   }
 
 }
@@ -46,7 +45,7 @@ private[lib] class RingSerializerHelper(lrcAddress: String, ring: Ring) {
   val orderSpendableSMap = MMap.empty[String, Int]
   val orderSpendableFeeMap = MMap.empty[String, Int]
 
-  def assemble(): String = {
+  def assemble(): ByteStream = {
     val numSpendables = setupSpendables
 
     datastream.addUint(0)
@@ -69,7 +68,7 @@ private[lib] class RingSerializerHelper(lrcAddress: String, ring: Ring) {
     stream.addUint(0)
     stream.addHex(datastream.getData)
 
-    stream.getData
+    stream
   }
 
   def setupSpendables: Int = {
@@ -107,25 +106,25 @@ private[lib] class RingSerializerHelper(lrcAddress: String, ring: Ring) {
   // 注意:
   // 1. 对于relay来说miner就是transactionOrigin
   def createMiningTable(): Unit = {
-    require(ring.miner.nonEmpty)
+    require(ring.transactionOrigin.nonEmpty)
 
-    val transactionOrigin = if (ring.transactionOrigin.nonEmpty) ring.transactionOrigin else ring.miner
-    val feeRecipient = if (ring.feeReceipt.nonEmpty) ring.feeReceipt else transactionOrigin
+    val feeRecipient = if (ring.feeReceipt.nonEmpty) ring.feeReceipt else ring.transactionOrigin
+    val miner = if (ring.miner.nonEmpty) ring.miner else feeRecipient
 
-    if (feeRecipient safeneq transactionOrigin) {
+    if (feeRecipient safeneq ring.transactionOrigin) {
       insertOffset(datastream.addAddress(ring.feeReceipt))
     } else {
       insertDefault()
     }
 
-    if (ring.miner safeneq feeRecipient) {
+    if (miner safeneq feeRecipient) {
       insertOffset(datastream.addAddress(ring.miner))
     } else {
       insertDefault()
     }
 
-    if (ring.sig.nonEmpty && (ring.miner safeneq transactionOrigin)) {
-      insertOffset(datastream.addHex(createBytes(ring.sig)))
+    if (ring.sig.nonEmpty && (miner safeneq ring.transactionOrigin)) {
+      insertOffset(datastream.addHex(createBytes(ring.sig), false))
       addPadding()
     } else {
       insertDefault()
@@ -141,7 +140,7 @@ private[lib] class RingSerializerHelper(lrcAddress: String, ring: Ring) {
     insertOffset(datastream.addAddress(order.tokenB))
     insertOffset(datastream.addUint(order.amountS, 32, false))
     insertOffset(datastream.addUint(order.amountB, 32, false))
-    insertOffset(datastream.addUint32(order.validSince, 32, false))
+    insertOffset(datastream.addUint32(order.validSince, 4, false))
 
     orderSpendableSMap.get(order.hash) match {
       case Some(x: Int) ⇒ tablestream.addUint16(x)
@@ -158,11 +157,18 @@ private[lib] class RingSerializerHelper(lrcAddress: String, ring: Ring) {
       insertDefault()
     }
 
-    // order.broker 默认占位
-    insertDefault()
+    if (order.broker.nonEmpty) {
+      insertOffset(datastream.addAddress(order.broker))
+    } else {
+      insertDefault()
+    }
 
     // order.interceptor默认占位
-    insertDefault()
+    if (order.orderInterceptor.nonEmpty) {
+      insertOffset(datastream.addAddress(order.orderInterceptor))
+    } else {
+      insertDefault()
+    }
 
     if (order.wallet.nonEmpty) {
       insertOffset(datastream.addAddress(order.wallet))
@@ -190,8 +196,7 @@ private[lib] class RingSerializerHelper(lrcAddress: String, ring: Ring) {
       insertDefault()
     }
 
-    val allOrNone = if (order.allOrNone) 1 else 0
-    tablestream.addUint16(allOrNone)
+    tablestream.addUint16(if (order.allOrNone) 1 else 0)
 
     if (order.feeToken.nonEmpty && (order.feeToken safeneq lrcAddress)) {
       insertOffset(datastream.addAddress(order.feeToken))
